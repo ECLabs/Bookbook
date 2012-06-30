@@ -4,6 +4,8 @@ import grails.converters.JSON
 
 import org.neo4j.graphdb.Direction
 import org.neo4j.graphdb.RelationshipType
+import org.springframework.web.multipart.MultipartHttpServletRequest
+import org.springframework.web.multipart.commons.CommonsMultipartFile
 
 class UserController {
 
@@ -30,7 +32,11 @@ class UserController {
 		else
 			render "user could not be added"
 	}
-	
+	/**
+	 * Example URIs:
+	 * 
+	 * /user/jgarland/follow?targetUserName=rjevans&follow-action=create
+	 */
 	def signIn = { 
 		println "in signIn(). username --> " + params.username + " password --> " + params.password
 		render userService.signIn(params.username, params.password)
@@ -40,6 +46,7 @@ class UserController {
 		//userService.deleteSubReferenceNodes(RelTypes.USERS_REFERENCE)
 		//userService.deleteAllUsers()
 		//userService.createTestUsers()
+		//render "hello"
 		render userService.findAllUsers() as JSON
 	}
 	
@@ -53,6 +60,25 @@ class UserController {
 		render userService.updateUser(jsonUser, params.userName) as JSON	
 	} 
 	
+	def updatePhoto = {
+		println "In updatePhoto()"
+		println request.getClass()
+		
+		if(request instanceof MultipartHttpServletRequest)
+		{
+		  MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;
+		  CommonsMultipartFile f = (CommonsMultipartFile) mpr.getFile("myFile");
+		  if(!f.empty) {
+			  println "success getting file"
+			flash.message = 'success'
+			f.transferTo(new File( '/tmp/' + params.userName + '_photo.png'))
+		  }
+		  else
+		   flash.message = 'file cannot be empty'
+		}
+		else
+		  flash.message = 'request is not of type MultipartHttpServletRequest'
+	}
 	def remove = {
 		render userService.deleteUser(params.userName)
 	}
@@ -100,6 +126,10 @@ class UserController {
 	
 	def deleteAllUsers = {
 		userService.deleteAllUsers()
+	}
+	
+	def list = {
+		flash.test = "test"
 	}
 
 }

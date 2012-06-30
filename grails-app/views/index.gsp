@@ -128,33 +128,37 @@
             </div>
         </div>
         <div id="pageBody">
-            <h1>Welcome to Grails</h1>
-            <p>Congratulations, you have successfully started your first Grails application! At the moment
-            this is the default page, feel free to modify it to either redirect to a controller or display whatever
-            content you may choose. Below is a list of controllers that are currently deployed in this application,
-            click on each to execute its default action:</p>
+            <h1>BookUp REST API Console</h1>
+            <p>Use this administrative console to learn how to use the API.  We've provided sample JSON for POST and PUT operations.  Actions taken via this console directly affect the online datasource.</p>
 
             <div id="controllerList" class="dialog">
-                <h2>Available Controllers:</h2>
+                <h2>REST Services</h2>
                 <ul>
                     <g:each var="c" in="${grailsApplication.controllerClasses.sort { it.fullName } }">
-                        <li class="controller"><g:link controller="${c.logicalPropertyName}">${c.fullName}</g:link></li>
+                        <g:if test="${c.fullName != 'bookbook.controllers.IndexController'}">
+                        	<li class="controller"><g:link controller="${c.logicalPropertyName}">${c.fullName}</g:link></li>
+                    	</g:if>
                     </g:each>
                 </ul>
             </div>
             
-            <%--<form action="http://localhost:8080/Bookbook/book" method="post">
-	                <input type="text" value="testing123" name="jsontext" />
-	                <input type="submit" value="go!" name="submit" />
-                </form>--%>
-                <textarea id="jsondata" name="jsondata" style="width: 600px;">{"bookId":3,"checkInDate":"Sun Nov 13 22:51:42 EST 2011","class":"bookbook.DummyCheckIn","createDate":null,"id":123,"latitude":"12 North","longitude":"34 West","narrative":"this is what i think of this book!","userName":"evansro","venue":"Whole Food, Reston, VA","chapterOrSection":"Chapter 19"}              
-                                            
-                                </textarea><br/>
-                <input type="text" value="evansro" name="text" id="bookId" />
+            <h3>Book Service</h3>
+            	<b>Add a book123</b>
+                <textarea id="jsondata" name="jsondata" style="width: 600px;">{"bookId":3,"checkInDate":"Sun Nov 13 22:51:42 EST 2011","class":"bookbook.DummyCheckIn","createDate":null,"id":123,"latitude":"12 North","longitude":"34 West","narrative":"this is what i think of this book!","userName":"evansro","venue":"Whole Food, Reston, VA","chapterOrSection":"Chapter 19"}</textarea>
+                <br/>
                 <input type="submit" value="Add book" name="button" onclick="sendPost('POST');" /> &nbsp;
+                <input type="text" value="evansro" name="text" id="bookId" />
+                
                 <input type="submit" value="Update book" name="button" onclick="sendPostUpdate();" />
         		<input type="submit" value="Update user" name="button" onclick="sendPostUser()" />
         		<input type="submit" value="createCheckIn" name="button" onclick="createCheckIn()" />
+        		
+        		
+        		Upload Form: <br />
+    <g:form action="updatePhoto" controller="user" method="post" enctype="multipart/form-data">
+        <input type="file" name="myFile" />
+        <input type="submit" />
+    </g:form>
         </div>
     </body>
 </html>

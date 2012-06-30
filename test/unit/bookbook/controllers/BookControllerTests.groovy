@@ -1,4 +1,4 @@
-package bookbook
+package bookbook.controllers
 
 import grails.test.*
 

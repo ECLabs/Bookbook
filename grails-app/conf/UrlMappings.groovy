@@ -6,28 +6,28 @@ class UrlMappings {
 		 * BOOKS
 		 */
 		
-		"/book"(controller:"book"){
+		"/api/book"(controller:"book"){
 			action = [GET:"findAll", POST:"add"]
 		}
 		
-		"/book/$id"(controller:"book"){
+		"/api/book/$id"(controller:"book"){
 			action = [GET:"find", PUT:"update", DELETE:"remove"]
 		}
 		
-		"/book/external"(controller:"book"){
+		"/api/book/external"(controller:"book"){
 			action = [GET:"findExternal"]
 		}
 		
-		"/book/all"(controller:"book"){
+		"/api/book/all"(controller:"book"){
 			action = [GET:"findAll"]
 		}
 		
 		// TODO: remove when we have DELETE/PUT working
-		"/book/delete/$id"(controller:"book"){
+		"/api/book/delete/$id"(controller:"book"){
 			action = [GET:"remove"]
 		}
 		// TODO: remove when we have DELETE/PUT working
-		"/book/update/$id"(controller:"book"){
+		"/api/book/update/$id"(controller:"book"){
 			action = [POST:"update"]
 		}
 		
@@ -35,34 +35,38 @@ class UrlMappings {
 		 * USERS MANAGEMENT
 		 */
 		
-		"/user"(controller:"user"){
+		"/api/user"(controller:"user"){
 			action = [GET:"findAll", POST:"add"]
 		}
 		
-		"/user/$userName"(controller:"user"){
+		"/api/user/$userName"(controller:"user"){
 			action = [GET:"findByUserName", PUT:"update", DELETE:"remove"]
 		}
 		
-		"/user/sign-in"(controller:"user"){
+		"/api/user/sign-in"(controller:"user"){
 			action = [GET:"signIn"]
 		}
 		
-		"/user/$userName/followers"(controller:"user"){
+		"/api/user/$userName/photo"(controller:"user"){
+			action = [POST:"updateUserPhoto"]
+		}
+		
+		"/api/user/$userName/followers"(controller:"user"){
 			action = [GET:"findFollowers"]
 		}
 		
-		"/user/$userName/following"(controller:"user"){
+		"/api/user/$userName/following"(controller:"user"){
 			action = [GET:"findFollowing"]
 		}
 		
-		"/user/$userName/follow/"(controller:"user"){
+		"/api/user/$userName/follow/"(controller:"user"){
 			action = [GET:"follow"]
 		}
 		
-		"/user/delete/$userName"(controller:"user") {
+		"/api/user/delete/$userName"(controller:"user") {
 			action = [GET:"remove"]
 		}
-		"/user/update/$userName"(controller:"user") {
+		"/api/user/update/$userName"(controller:"user") {
 			action = [POST:"update"]
 		}
 		
@@ -70,19 +74,23 @@ class UrlMappings {
 		 * CHECK INS
 		 */
 		
-		"/book/$bookId/checkIn"(controller:"book") {
+		"/api/book/$bookId/checkIn"(controller:"book") {
 			action = [GET:"findCheckInsByBookId", POST:"establishCheckIn"]
 		}
 		
-		"/user/$userName/checkIn"(controller:"user") {
+		"/api/user/$userName/checkIn"(controller:"user") {
 			action = [GET:"findCheckInsByUserId", POST:"establishCheckIn"]
 		}
 		
-		"/book/$id/checkInDummy"(controller:"book") {
+		"/api/book/$id/checkInDummy"(controller:"book") {
 			action = [GET:"getDummyCheckIn"]
 		}
 		
-		
+		"/$controller/$action?/$id?"{
+			constraints {
+				// apply constraints here
+			}
+		}
 		
 		"/"(view:"/index")
 		"500"(view:'/error')

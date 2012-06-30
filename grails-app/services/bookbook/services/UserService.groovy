@@ -38,12 +38,13 @@ class UserService {
 	@PreDestroy
 	def cleanUp() {
 		println "############### cleanUp()  - Shutting down graphDb."
-		//graphDb.shutdown();
+		graphDb.shutdown();
 	}
 	
 	def shutdown()
 	{
 		graphDb.shutdown();
+		
 	}
 	def registerShutdownHook()
 	{

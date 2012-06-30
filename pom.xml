@@ -28,7 +28,7 @@
       <scope>test</scope>
     </dependency>
 	</dependencies>
-	 <build>
-    <finalName>Bookbook</finalName>
-  </build>
+	<build>
+    	<finalName>Bookbook</finalName>
+  	</build>
 </project>

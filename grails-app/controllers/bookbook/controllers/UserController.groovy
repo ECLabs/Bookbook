@@ -64,10 +64,7 @@ class UserController {
 		println "In updatePhoto()"
 		println request.getClass()
 		
-		if(request instanceof MultipartHttpServletRequest)
-		{
-		  MultipartHttpServletRequest mpr = (MultipartHttpServletRequest)request;
-		  CommonsMultipartFile f = (CommonsMultipartFile) mpr.getFile("myFile");
+		def f = request.getFile("myFile");
 		  if(!f.empty) {
 			  println "success getting file"
 			flash.message = 'success'
@@ -77,9 +74,6 @@ class UserController {
 		  else {
 		   render 'file cannot be empty'
 		  }
-		}
-		else
-		  render 'request is not of type MultipartHttpServletRequest'
 	}
 	def remove = {
 		render userService.deleteUser(params.userName)

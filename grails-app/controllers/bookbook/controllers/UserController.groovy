@@ -72,12 +72,14 @@ class UserController {
 			  println "success getting file"
 			flash.message = 'success'
 			f.transferTo(new File( '/tmp/' + params.userName + '_photo.png'))
+			render ""
 		  }
-		  else
-		   flash.message = 'file cannot be empty'
+		  else {
+		   render 'file cannot be empty'
+		  }
 		}
 		else
-		  flash.message = 'request is not of type MultipartHttpServletRequest'
+		  render 'request is not of type MultipartHttpServletRequest'
 	}
 	def remove = {
 		render userService.deleteUser(params.userName)

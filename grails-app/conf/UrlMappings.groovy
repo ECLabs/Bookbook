@@ -48,7 +48,7 @@ class UrlMappings {
 		}
 		
 		"/api/user/$userName/photo"(controller:"user"){
-			action = [POST:"updateUserPhoto"]
+			action = [POST:"updatePhoto"]
 		}
 		
 		"/api/user/$userName/followers"(controller:"user"){

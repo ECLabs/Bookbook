@@ -180,6 +180,16 @@ class UserService {
 		return allUsers
 	}
 	
+	def findNumberOfUsersByUserName(userName) {
+		println "in findNumberOfUsersByUserName(), looking for property [ $userName ]"
+			
+		userIndex = graphDb.index().forNodes('users')
+		IndexHits<Node> hits = userIndex.get('userName', userName)
+		def numUsers = hits.size()
+		hits.close()
+		return numUsers
+	}
+	
 	def findUsersByProperty(property, value) {
 		println "in findUsersByProperty(), looking for property [ $property ] with value [ $value ]"
 		
@@ -189,7 +199,8 @@ class UserService {
 		if(property.equals('id') || property.equals('userName'))
 		{
 			IndexHits<Node> hits = userIndex.get(property, value)
-			userNode = hits.getSingle()
+			userNode = hits.next()
+			hits.close()
 		}
 		if(userNode)
 		{

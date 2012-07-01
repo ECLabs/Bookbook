@@ -21,16 +21,22 @@ class UserController {
 		FOLLOW
 	}
 	
-	def add = { 
-		
-		println "in add(). Json Data is --> " + params['jsondata']
+	def add = { 		
+		println "in add(). Incoming json data is --> " + params['jsondata']
 
+		// validate that no other user with the username already exists.
 		def jsonUser = JSON.parse(params['jsondata'])
+		if(validateAddUser(jsonUser) == false) {
+			render "{field:'userName',error:'Username " + jsonUser.userName + " already exists. Please try another.'}"
+			return
+		}
+		
+		// all is good.. add the user
+		println "validation checked out ok!"
 		def addedUser = userService.addUser(jsonUser)
-		if(addedUser)
+		if(addedUser) {
 			render addedUser as JSON
-		else
-			render "user could not be added"
+		}				
 	}
 	/**
 	 * Example URIs:
@@ -126,6 +132,15 @@ class UserController {
 	
 	def list = {
 		flash.test = "test"
+	}
+	
+	def validateAddUser(user) {
+		def userCount = userService.findNumberOfUsersByUserName(user.userName)
+		println "Number of users with username $user.userName: $userCount"
+		if(userCount > 0) {
+			return false;
+		}
+		return true;
 	}
 
 }

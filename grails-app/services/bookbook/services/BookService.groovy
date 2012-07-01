@@ -58,7 +58,7 @@ class BookService {
 	@PreDestroy
 	def cleanUp() {
 		println "############### cleanUp()  - Shutting down graphDb."
-		graphDb.shutdown();
+		//graphDb.shutdown();
 	}
 	
 	def enum RelTypes implements RelationshipType

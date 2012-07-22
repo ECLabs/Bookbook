@@ -52,7 +52,7 @@ class Book {
 	public String getSmallThumbnailUrl() { underlyingNode.getProperty("smallThumbnailUrl", null) }
 	public String getThumbnailUrl() { underlyingNode.getProperty("thumbnailUrl", null) }
 	public String getCreateDate() { underlyingNode.getProperty("createDate", null) }
-	public Long getBookId() { underlyingNode.getProperty("id", null) }
+	public Long getBookId() { return underlyingNode.getProperty("id", null) == null ? 1234 : underlyingNode.getProperty("id", null) }
 	
 	public void setTitle(String value) {
 		underlyingNode.setProperty("title", value)	

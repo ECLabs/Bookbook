@@ -68,7 +68,7 @@ class BookController {
 		def jsonBook = JSON.parse(params.jsondata)
 		def googleBook = new GoogleBook(jsonBook)
 		
-		def updatedBook = bookService.updateBook(googleBook, params.id)
+		def updatedBook = bookService.updateBook(googleBook, Long.valueOf(params.id))
 		if(updatedBook)
 			render "book updated successfully!"
 		else
@@ -84,7 +84,7 @@ class BookController {
 	
 	def establishCheckIn = {
 		def jsonCheckIn = JSON.parse(params.jsondata)
-		render bookService.createCheckIn(jsonCheckIn, params.bookId, jsonCheckIn.userName) as JSON
+		render bookService.createCheckIn(jsonCheckIn, params.bookId, jsonCheckIn.userId) as JSON
 	}
 	
 	def findCheckInsByBookId = {

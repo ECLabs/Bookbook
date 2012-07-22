@@ -86,6 +86,41 @@ class UrlMappings {
 			action = [GET:"getDummyCheckIn"]
 		}
 		
+		/**
+		 * LISTS (Likes, Read a while ago, Recently Read, Want to Read, custom)
+		 */
+		/*
+		"/api/list"(controller:"list") {
+			action = [GET:"findAllLists"]
+		}
+		*/
+		"/api/list/userId-$userId"(controller:"list") {
+			action = [GET:"findListsByUserId", POST:"addBookToList"]
+		}
+		
+		"/api/list/bookId-$bookId"(controller:"list") {
+			action = [GET:"findListsByBookId"]
+		}
+		/* Can't get queries by relationship type to work yet, so we'll have to get them all from the 
+		 * above query
+		 *
+		"/api/list/userId-$userId/like"(controller:"list") {
+			action = [GET:"findLikeByUserId"]
+		}
+		
+		"/api/list/userId-$userId/have-read"(controller:"list") {
+			action = [GET:"findHaveReadByUserId"]
+		}
+		
+		"/api/list/$id"(controller:"list") {
+			action = [GET:"findListById", PUT:"updateList", DELETE:"removeList"]
+		}
+		
+		"/api/list/$id/book/$bookId"(controller:"list") {
+			action = [POST:"addBookToList", DELETE:"removeBookFromList"]
+		}
+		*/
+		
 		"/$controller/$action?/$id?"{
 			constraints {
 				// apply constraints here

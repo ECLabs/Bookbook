@@ -11,6 +11,7 @@ class User {
 	String firstName
 	String middleName
 	String lastName
+	String fullName
 	String userName
 	String email
 	String password
@@ -19,6 +20,7 @@ class User {
 	String endDate
 	String updateDate
 	String lastLoginDate
+	String location
 	String userTypeCode // i.e. user, superuser, author, guest, auditor, placeholder (used for popular reviewers)
 	String aboutMe // 140 characters of text about the user
 	String activationMethod // i.e. facebook, openid, native
@@ -38,6 +40,7 @@ class User {
 	public String getFirstName() { underlyingNode.getProperty("firstName", null) }
 	public String getLastName() { underlyingNode.getProperty("lastName", null) }
 	public String getMiddleName() { underlyingNode.getProperty("middleName", null) }
+	public String getFullName() { underlyingNode.getProperty("fullName", null) }
 	public String getUserName() { underlyingNode.getProperty("userName", null) }
 	public String getEmail() { underlyingNode.getProperty("email", null) }
 	public String getPassword() { underlyingNode.getProperty("password", null) }
@@ -47,6 +50,7 @@ class User {
 	public String getUpdateDate() { underlyingNode.getProperty("upateDate", null) }
 	public String getLastLoginDate() { underlyingNode.getProperty("lastLoginDate", null) }
 	public String getUserTypeCode() { underlyingNode.getProperty("userTypeCode", null) }
+	public String getLocation() { underlyingNode.getProperty("location", null) }
 	public String getAboutMe() { underlyingNode.getProperty("aboutMe", null) }
 	public String getActivationMethod() { underlyingNode.getProperty("activationMethod", null) }
 	public String getNumberOfFollowers() { underlyingNode.getProperty("numberOfFollowers", null) }
@@ -56,6 +60,7 @@ class User {
 	public void setFirstName(String value) { underlyingNode.setProperty("firstName", value) }
 	public void setLastName(String value) { underlyingNode.setProperty("lastName", value) }
 	public void setMiddleName(String value) { if(value != null) underlyingNode.setProperty("middleName", value) }
+	public void setFullName(String value) { if(value != null) underlyingNode.setProperty("fullName", value) }
 	public void setUserName(String value) { underlyingNode.setProperty("userName", value) }
 	public void setEmail(String value) { underlyingNode.setProperty("email", value) }
 	public void setPassword(String value) { underlyingNode.setProperty("password", value) }
@@ -65,6 +70,7 @@ class User {
 	public void setUpdateDate(String value) { underlyingNode.setProperty("updateDate", value) }
 	public void setLastLoginDate(String value) { underlyingNode.setProperty("lastLoginDate", value) }
 	public void setUserTypeCode(String value) { underlyingNode.setProperty("userTypeCode", value) }
+	public void setLocation(String value) { underlyingNode.setProperty("location", value) }
 	public void setAboutMe(String value) { underlyingNode.setProperty("aboutMe", value) }
 	public void setActivationMethod(String value) { underlyingNode.setProperty("activationMethod", value) }
 	public void setNumberOfFollowers(String value) { underlyingNode.setProperty("numberOfFollowers", value) }
@@ -78,6 +84,7 @@ class User2 {
 	String firstName
 	String middleName
 	String lastName
+	String fullName
 	String userName
 	String email
 	String password
@@ -86,6 +93,7 @@ class User2 {
 	String endDate
 	String updateDate
 	String lastLoginDate
+	String location
 	String userTypeCode // i.e. user, superuser, author, guest, auditor, placeholder (used for popular reviewers)
 	String aboutMe // 140 characters of text about the user
 	String activationMethod // i.e. facebook, openid, native

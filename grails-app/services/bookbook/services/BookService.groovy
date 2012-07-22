@@ -107,14 +107,14 @@ class BookService {
 					return !pos.isStartNode();
 				}
 			},
-			RelTypes.BOOK, Direction.OUTGOING,
+			RelTypes.BOOK, Direction.OUTGOING
 		);
 		
 		def allBooks = []
 		for(node in trav) {
 			allBooks.push(new Book(node))
 		}
-		
+		println "got this number of books" + allBooks.size()
 		return allBooks
 	}
 	
@@ -126,13 +126,16 @@ class BookService {
 		if(property.equals('id'))
 		{
 			IndexHits<Node> hits = bookIndex.get(property, value)
-			Node bookNode = hits.getSingle()
-			if(bookNode)
-			{
-				println "### book found in index ###"
-				def book = new Book(bookNode)
-				return book
+			if(hits.hasNext()) {
+				Node bookNode = hits.next()
+				if(bookNode)
+				{
+					println "### book found in index ###"
+					def book = new Book(bookNode)
+					return book
+				}
 			}
+			hits.close()
 		}
 		
 		Node brefNode = getBooksReferenceNode()
@@ -141,11 +144,13 @@ class BookService {
 			{
 				public boolean isReturnableNode( TraversalPosition pos )
 				{
+					println "current value = " + pos.currentNode().getProperty(property, null)
+
 					return !pos.isStartNode() &&
-						pos.lastRelationshipTraversed().getEndNode().getProperty(property, null).equals(value)
+						pos.currentNode().getProperty(property, null).equals(Long.valueOf(value))
 				}
 			},
-			RelTypes.BOOK, Direction.OUTGOING,
+			RelTypes.BOOK, Direction.OUTGOING
 		);
 		
 		def allBooks = []
@@ -203,11 +208,12 @@ class BookService {
 	}
 	
 	def updateBook(GoogleBook b, id) {
-		println "in updateBook()"
+		println "in updateBook() - b.bookId = ${b.bookId} & id = ${id}"
 		Transaction tx = graphDb.beginTx()
 		try {
+			def bookId = b.bookId
 			// make sure the id matches
-			if(id != b.bookId) {
+			if(!id.equals(bookId)) {
 				println "Could not update.. id did not match"
 				return null
 			}
@@ -272,14 +278,15 @@ class BookService {
 		}
 	}
 	
-	def createCheckIn(data, bookId, userName) {
+	def createCheckIn(data, bookId, userId) {
 		
 		println "data-" + data.toString()
 		CheckIn ci = null
-		User u = userService.findUsersByProperty("userName", userName)
+		User u = userService.findUsersByProperty("id", userId)
 		Book b = this.findBooksByProperty("id", bookId)
 		
 		// check for existing relationship
+		/* allow more than one check-in for the same book/user combo
 		def existingCheckIns = u.underlyingNode.getRelationships(RelTypes.CHECK_IN, Direction.OUTGOING)
 		println "existingCheckIns: ${existingCheckIns}"
 		for(checkInRel in existingCheckIns) {
@@ -291,7 +298,7 @@ class BookService {
 				return false
 			}
 		}
-		
+		*/
 		Transaction tx = graphDb.beginTx()
 		try {
 			Relationship rel = u.underlyingNode.createRelationshipTo(b.underlyingNode, RelTypes.CHECK_IN)
@@ -305,7 +312,6 @@ class BookService {
 				longitude = data.longitude
 				return it
 			}
-			ci.narrative = "testing"
 			println "checkinobject:" + ci
 			
 			// get id
@@ -323,13 +329,10 @@ class BookService {
 			
 			ci.checkInId = counter
 			
-			println "here3"
-			
 			// add to index
 			def checkInIndex = graphDb.index().forRelationships("checkIns")
-			println "checkInId - ${ci.checkInId}"
+			println "adding checkin to index - checkInId: ${ci.checkInId}"
 			checkInIndex.add(ci.underlyingRel, "id", counter)
-			println "here5"
 			tx.success()
 		}
 		catch(e) {
@@ -373,23 +376,23 @@ class BookService {
 	def findCheckInsByBookId(bookId) {
 		def checkInIndex = graphDb.index().forRelationships("checkIns")
 		def b = findBooksByProperty("id", bookId)
-		def rels = checkInIndex.query("type:check_in", null, b.underlyingNode)
+		def rels = checkInIndex.query(null, null, b.underlyingNode)
 		def allCheckIns = []
 		for(rel in rels) {
-			CheckIn ci = CheckIn(rel)
+			CheckIn ci = new CheckIn(rel)
 			allCheckIns.push(ci)
 		}
 		println "found [${allCheckIns.size()}] check-ins for book [${b.title}]"
 		
 		def allCheckIns2 = []
-		def rels2 = b.underlyingNode.getRelationships(RelTypes.CHECK_IN, Direction.OUTGOING)
+		def rels2 = b.underlyingNode.getRelationships(RelTypes.CHECK_IN, Direction.INCOMING)
 		for (rel2 in rels2) {
 			CheckIn ci = new CheckIn(rel2)
-			allCheckIns2.push(ci)
+			allCheckIns2.push(ci) // .equals() doesn't allow duplicates
 		}
 		println "found [${allCheckIns2.size()}] check-ins in graph for book with bookId [${b.bookId}]"
 		
-		return allCheckIns
+		return allCheckIns 
 	}
 	
 	def deleteCheckIn(checkInId) {

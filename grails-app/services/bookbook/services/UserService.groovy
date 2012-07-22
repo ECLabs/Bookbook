@@ -93,6 +93,8 @@ class UserService {
 				firstName = userIn.firstName == null ? "" : userIn.firstName == null
 				middleName = userIn.middleName == null ? "" : userIn.middleName
 				lastName  = userIn.lastName == null ? "" : userIn.lastName
+				fullName  = userIn.fullName == null ? "" : userIn.fullName
+				location  = userIn.location == null ? "" : userIn.location
 				userName = userIn.userName
 				email = userIn.email
 				password = userIn.password == null ? "" : userIn.password
@@ -137,6 +139,8 @@ class UserService {
 				firstName = userIn.firstName == null ? "" : userIn.firstName
 				middleName = userIn.middleName == null ? "" : userIn.middleName
 				lastName  = userIn.lastName == null ? "" : userIn.lastName
+				fullName  = userIn.fullName == null ? "" : userIn.fullName
+				location  = userIn.location == null ? "" : userIn.location
 				userName = userIn.userName == null ? "" : userIn.userName
 				email = userIn.email == null ? "" : userIn.email
 				password = userIn.password == null ? "" : userIn.password
@@ -204,7 +208,7 @@ class UserService {
 		}
 		if(userNode)
 		{
-			println "### book found in index ###"
+			println "### user found in index ###"
 			def u = new User(userNode)
 			return u
 		}

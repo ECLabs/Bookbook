@@ -159,6 +159,12 @@
         <input type="file" name="myFile" />
         <input type="submit" />
     </g:form>
+    
+    		<h3>List Service</h3>
+    		<g:select name="usernames"
+          from="${users}"
+          optionValue="userName"
+          optionKey="userId" />
         </div>
     </body>
 </html>

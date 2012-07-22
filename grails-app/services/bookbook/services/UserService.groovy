@@ -116,19 +116,19 @@ class UserService {
 		}
 		return u
 	}
-	def updateUser(userIn, userName) {
+	def updateUser(userIn, userId) {
 		println "in updateUser - userIn" + userIn.toString()
 		Transaction tx = graphDb.beginTx()
 		def u = null
 		try {
 			// make sure the id matches
-			if(userName != userIn.userName) {
-				println "Could not update.. userName did not match"
+			if(Long.valueOf(userId) != userIn.userId) {
+				println "Could not update.. userId did not match"
 				return null
 			}
 			
 			// check to see if the user was already added
-			u = findUsersByProperty("userName", userName)
+			u = findUsersByProperty("id", Long.valueOf(userId))
 			if(!u)
 			{
 				println "Could not update.. user not found"
@@ -203,14 +203,16 @@ class UserService {
 		if(property.equals('id') || property.equals('userName'))
 		{
 			IndexHits<Node> hits = userIndex.get(property, value)
-			userNode = hits.next()
-			hits.close()
-		}
-		if(userNode)
-		{
-			println "### user found in index ###"
-			def u = new User(userNode)
-			return u
+			if(hits.hasNext()) {
+				userNode = hits.next()
+				hits.close()
+				if(userNode)
+				{
+					println "### user found in index ###"
+					def u = new User(userNode)
+					return u
+				}
+			}
 		}
 		
 		Node urefNode = getSubReferenceNode(RelTypes.USERS_REFERENCE)
@@ -220,7 +222,7 @@ class UserService {
 				public boolean isReturnableNode( TraversalPosition pos )
 				{
 					return !pos.isStartNode() &&
-						pos.lastRelationshipTraversed().getEndNode().getProperty(property, null).equals(value)
+						pos.currentNode().getProperty(property, null).equals(Long.valueOf(value))
 				}
 			},
 			RelTypes.USER, Direction.OUTGOING

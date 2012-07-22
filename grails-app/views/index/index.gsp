@@ -97,10 +97,20 @@
         		});
         	}
         	
+        	function getUser() {
+				var url = "api/user/userId-"
+				var id = $('#users_updateuser').val()
+				url = url + id
+
+        		$.getJSON(url, function(data) {
+        			$('#jsondata_updateuser').val(JSON.stringify(data));
+        		});
+        	}
+        	
         	function updateUser() {
 				var url = "api/user"
 				var id = $('#users_updateuser').val()
-				url = url + "/update/" + id
+				url = url + "/update/userId-" + id
         		$.ajax({
         			url: url,
         			type: 'POST',
@@ -406,7 +416,7 @@
 					<tr>
 						<td width="120">User JSON:</td>
 						<td>
-							<textarea id="jsondata_updateuser" name="jsondata_updateuser" style="width: 450px;">{"aboutMe":"","activationMethod":"native","createDate":"Sun Jul 01 16:30:30 EDT 2012","email":"test@test.com","endDate":null,"firstName":"false","lastLoginDate":null,"lastName":"null","middleName":"null","fullName":"Robert Houston","location":"Reston, VA","password":"test","photoUrl":"","updateDate":null,"userName":"test","userId":123,"userTypeCode":"user"}</textarea>
+							<textarea id="jsondata_updateuser" name="jsondata_updateuser" style="width: 450px;"></textarea>
 	          			</td>
 					</tr>
 					

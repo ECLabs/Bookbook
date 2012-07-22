@@ -60,10 +60,14 @@ class UserController {
 		render userService.findUsersByProperty("userName", params.userName) as JSON
 	}
 	
+	def findByUserId = {
+		render userService.findUsersByProperty("id", Long.valueOf(params.userId)) as JSON
+	}
+	
 	def update = { 
 		def jsonUser = JSON.parse(params.jsondata)
-		println "userName to update - ${params.userName}"
-		render userService.updateUser(jsonUser, params.userName) as JSON	
+		println "userId to update - ${params.userId}"
+		render userService.updateUser(jsonUser, params.userId) as JSON	
 	} 
 	
 	def updatePhoto = {

@@ -40,7 +40,11 @@ class UrlMappings {
 		}
 		
 		"/api/user/$userName"(controller:"user"){
-			action = [GET:"findByUserName", PUT:"update", DELETE:"remove"]
+			action = [GET:"findByUserName"]
+		}
+		
+		"/api/user/userId-$userId"(controller:"user"){
+			action = [GET:"findByUserId", PUT:"update", DELETE:"remove"]
 		}
 		
 		"/api/user/sign-in"(controller:"user"){
@@ -66,7 +70,7 @@ class UrlMappings {
 		"/api/user/delete/$userName"(controller:"user") {
 			action = [GET:"remove"]
 		}
-		"/api/user/update/$userName"(controller:"user") {
+		"/api/user/update/userId-$userId"(controller:"user") {
 			action = [POST:"update"]
 		}
 		

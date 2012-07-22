@@ -128,6 +128,7 @@ class BookService {
 			IndexHits<Node> hits = bookIndex.get(property, value)
 			if(hits.hasNext()) {
 				Node bookNode = hits.next()
+				hits.close()
 				if(bookNode)
 				{
 					println "### book found in index ###"
@@ -135,7 +136,7 @@ class BookService {
 					return book
 				}
 			}
-			hits.close()
+			
 		}
 		
 		Node brefNode = getBooksReferenceNode()

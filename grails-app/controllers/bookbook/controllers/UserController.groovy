@@ -1,5 +1,6 @@
 package bookbook.controllers
 
+import bookbook.domain.User
 import grails.converters.JSON
 
 import org.neo4j.graphdb.Direction
@@ -11,6 +12,8 @@ class UserController {
 
 	def userService
 	def bookService
+	def basePhotoPath = '/usr/bin/tomcat7/webapps/BookUpImages/'
+	def basePhotoUrl = 'http://labs.evanschambers.com:8080/BookUpImages/'
 	
 	def enum RelTypes implements RelationshipType
 	{
@@ -78,7 +81,14 @@ class UserController {
 		  if(!f.empty) {
 			  println "success getting file"
 			flash.message = 'success'
-			f.transferTo(new File( '/tmp/' + params.userName + '_photo.png'))
+			def path = basePhotoPath + params.userName + '_photo.png'
+			def url =  basePhotoUrl + params.userName + '_photo.png'
+			f.transferTo(new File(path))
+			
+			// update the photoUrl on the user record
+			User u = userService.findUsersByProperty("userName",params.userName)
+			u.setPhotoUrl(url)
+			userService.updateUser(u, u.getUserId())
 			render ""
 		  }
 		  else {

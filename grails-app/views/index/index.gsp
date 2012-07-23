@@ -451,7 +451,7 @@
 					<tr>
 						<td width="120">UserName:</td>
 						<td>
-							<input type="text" value="" name="text" id="bookId_updateuser" />						
+							<input type="text" value="" name="userName" id="userName_updateuser" />						
 	          			</td>
 					</tr>
 					<tr>

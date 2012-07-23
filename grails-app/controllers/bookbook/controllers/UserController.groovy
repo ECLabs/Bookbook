@@ -7,6 +7,8 @@ import org.neo4j.graphdb.Direction
 import org.neo4j.graphdb.RelationshipType
 import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
+import org.codehaus.groovy.grails.web.converters.ConverterUtil
+import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
 
 class UserController {
 
@@ -86,9 +88,7 @@ class UserController {
 			f.transferTo(new File(path))
 			
 			// update the photoUrl on the user record
-			User u = userService.findUsersByProperty("userName",params.userName)
-			u.setPhotoUrl(url)
-			userService.updateUser(u, u.getUserId())
+			userService.updateUserPhotoUrl(params.userName, url)
 			render ""
 		  }
 		  else {

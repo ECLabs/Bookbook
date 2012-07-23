@@ -162,6 +162,27 @@ class UserService {
 		return u
 	}
 	
+	def updateUserPhotoUrl(userName, photoUrl) {
+		println "in updateUserPhotoUrl - userName: ${userName}, photoUrl:${photoUrl}"
+		Transaction tx = graphDb.beginTx()
+		def u = null
+		try {
+			u = findUsersByProperty("userName", userName)
+			if(!u)
+			{
+				println "Could not update.. user not found"
+				return false
+			}
+			
+			u.setPhotoUrl(photoUrl)
+			tx.success()
+		}
+		finally {
+			tx.finish()
+		}
+		return u
+	}
+	
 	def findAllUsers() {
 		Node refNode = getSubReferenceNode(RelTypes.USERS_REFERENCE)
 		
@@ -197,6 +218,9 @@ class UserService {
 	def findUsersByProperty(property, value) {
 		println "in findUsersByProperty(), looking for property [ $property ] with value [ $value ]"
 		
+		if(property.equals("id")) {
+			value = Long.valueOf(value)
+		}
 		userIndex = graphDb.index().forNodes('users')
 		
 		Node userNode = null
@@ -222,7 +246,7 @@ class UserService {
 				public boolean isReturnableNode( TraversalPosition pos )
 				{
 					return !pos.isStartNode() &&
-						pos.currentNode().getProperty(property, null).equals(Long.valueOf(value))
+						pos.currentNode().getProperty(property, null).equals(value)
 				}
 			},
 			RelTypes.USER, Direction.OUTGOING

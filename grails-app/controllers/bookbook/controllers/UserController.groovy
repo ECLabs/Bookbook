@@ -83,8 +83,9 @@ class UserController {
 		  if(!f.empty) {
 			  println "success getting file"
 			flash.message = 'success'
-			def path = basePhotoPath + params.userName + '_photo.png'
-			def url =  basePhotoUrl + params.userName + '_photo.png'
+			def suffix = params.userName + ".profilephoto.${new Date().getTime()}.png";
+			def path = basePhotoPath + suffix
+			def url =  basePhotoUrl + suffix
 			f.transferTo(new File(path))
 			
 			// update the photoUrl on the user record

@@ -9,6 +9,7 @@ import org.springframework.web.multipart.MultipartHttpServletRequest
 import org.springframework.web.multipart.commons.CommonsMultipartFile
 import org.codehaus.groovy.grails.web.converters.ConverterUtil
 import org.codehaus.groovy.grails.commons.DefaultGrailsApplication
+import javax.servlet.http.HttpServletRequest
 
 class UserController {
 
@@ -53,6 +54,35 @@ class UserController {
 		render userService.signIn(params.username, params.password)
 	}
 	
+	def signInFacebook = {
+		println "in signInFacebook(). jsondata -->" + params['jsondata']
+		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
+		println "updated json - " + jsonNoReturns
+		def jsonUser = JSON.parse(jsonNoReturns)
+		byte[] b = jsonUser.picture.decodeBase64()
+		def user = userService.signInFacebook(jsonUser)
+		def now = new Date()
+		
+		// Write to a file
+		def filename = user.userId + ".profilephoto.${new Date().getTime()}.png";
+		def fos= new FileOutputStream(basePhotoPath + filename)
+		fos.write(b);
+		fos.close()
+		
+		// TODO: move this into the signInFacebook() method
+		// Update user photoUrl
+		def url = basePhotoUrl + filename 
+		userService.updateUserPhotoUrl(user.userId, url)
+		
+		if(user) {
+			println "Login successful for user ${user.userName}:${user.userId}"
+			render user as JSON
+		} else {
+			println "Login failed - sending 403 Forbidden"
+			response.sendError(HttpServletResponse.SC_FORBIDDEN)
+		}
+	}
+	
 	def findAll = {
 		//userService.deleteSubReferenceNodes(RelTypes.USERS_REFERENCE)
 		//userService.deleteAllUsers()
@@ -83,13 +113,13 @@ class UserController {
 		  if(!f.empty) {
 			  println "success getting file"
 			flash.message = 'success'
-			def suffix = params.userName + ".profilephoto.${new Date().getTime()}.png";
+			def suffix = params.userId + ".profilephoto.${new Date().getTime()}.png";
 			def path = basePhotoPath + suffix
 			def url =  basePhotoUrl + suffix
 			f.transferTo(new File(path))
 			
 			// update the photoUrl on the user record
-			userService.updateUserPhotoUrl(params.userName, url)
+			userService.updateUserPhotoUrl(params.userId, url)
 			render ""
 		  }
 		  else {

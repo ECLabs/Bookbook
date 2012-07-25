@@ -24,6 +24,9 @@ class User {
 	String userTypeCode // i.e. user, superuser, author, guest, auditor, placeholder (used for popular reviewers)
 	String aboutMe // 140 characters of text about the user
 	String activationMethod // i.e. facebook, openid, native
+	String facebookId
+	String gender
+	String facebookUpdateTime
 	Long numberOfFollowers // from index
 	Long numberFollowing // from index
 	Node underlyingNode
@@ -55,6 +58,9 @@ class User {
 	public String getActivationMethod() { underlyingNode.getProperty("activationMethod", null) }
 	public String getNumberOfFollowers() { underlyingNode.getProperty("numberOfFollowers", null) }
 	public String getNumberFollowing() { underlyingNode.getProperty("numberFollowing", null) }
+	public String getFacebookId() { underlyingNode.getProperty("facebookId", null) }
+	public String getFacebookUpdateTime() { underlyingNode.getProperty("facebookUpdateTime", null) }
+	public String getGender() { underlyingNode.getProperty("gender", null) }
 	
 	public void setUserId(Long value) { underlyingNode.setProperty("id", value) }
 	public void setFirstName(String value) { underlyingNode.setProperty("firstName", value) }
@@ -75,7 +81,9 @@ class User {
 	public void setActivationMethod(String value) { underlyingNode.setProperty("activationMethod", value) }
 	public void setNumberOfFollowers(String value) { underlyingNode.setProperty("numberOfFollowers", value) }
 	public void setNumberFollowing(String value) { underlyingNode.setProperty("numberFollowing", value) }
-	
+	public void setGender(String value) { underlyingNode.setProperty("gender", value) }
+	public void setFacebookId(String value) { underlyingNode.setProperty("facebookId", value) }
+	public void setFacebookUpdateTime(String value) { underlyingNode.setProperty("facebookUpdateTime", value) }
 	static transients = ["underlyingNode", "recentCheckIns","bookLists","numberOfFollowers","numberFollowing"]
 }
 

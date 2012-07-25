@@ -449,9 +449,12 @@
         		<g:form action="updatePhoto" controller="user" method="post" enctype="multipart/form-data">
         		<table style="width: 600px;border-collapse:collapse" border="1" bordercolor="gray">
 					<tr>
-						<td width="120">UserName:</td>
+						<td width="120">User ID:</td>
 						<td>
-							<input type="text" value="" name="userName" id="userName_updateuser" />						
+							<g:select name="userId"
+					          from="${users}"
+					          optionValue="${{it.userName+':'+it.userId}}"
+					          optionKey="userId" />							
 	          			</td>
 					</tr>
 					<tr>

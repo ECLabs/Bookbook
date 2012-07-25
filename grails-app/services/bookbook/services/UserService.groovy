@@ -3,6 +3,10 @@ package bookbook.services
 import javax.annotation.PostConstruct
 import javax.annotation.PreDestroy
 
+import org.joda.time.DateTime
+import org.joda.time.format.DateTimeFormat
+import org.joda.time.format.DateTimeFormatter
+import org.joda.time.DateTimeComparator
 import org.neo4j.graphdb.Direction
 import org.neo4j.graphdb.Node
 import org.neo4j.graphdb.RelationshipType
@@ -12,8 +16,6 @@ import org.neo4j.graphdb.Transaction
 import org.neo4j.graphdb.TraversalPosition
 import org.neo4j.graphdb.Traverser.Order
 import org.neo4j.graphdb.index.IndexHits
-import org.neo4j.kernel.EmbeddedGraphDatabase
-
 import bookbook.domain.User
 import bookbook.domain.User2
 
@@ -75,8 +77,8 @@ class UserService {
 		def userType = "user"
 		// validation
 		userIn.with {
-			if(!userName || !password) {
-				println "userName and password are required fields."
+			if(!activationMethod.equals("facebook") && (!userName || !password)) {
+				println "userName and password are required fields for non-facebook enabled accounts."
 				return null
 			}
 			if(userTypeCode) {
@@ -105,10 +107,16 @@ class UserService {
 				activationMethod = userIn.activationMethod
 				numberFollowing = 0
 				numberOfFollowers = 0
+				facebookId = userIn.facebookId == null ? "" : userIn.facebookId
+				gender = userIn.gender == null ? "" : userIn.gender
+				facebookUpdateTime = userIn.facebookUpdateTime == null ? "" : userIn.facebookUpdateTime
 				return it
 			}
+			println "just added this email... ${u.email}"
 			userIndex = graphDb.index().forNodes('users')
 			userIndex.add(u.underlyingNode, "userName", u.userName)
+			userIndex.add(u.underlyingNode, "id", u.userId)
+			userIndex.add(u.underlyingNode, "email", u.email)
 			tx.success()
 		}
 		finally {
@@ -122,7 +130,7 @@ class UserService {
 		def u = null
 		try {
 			// make sure the id matches
-			if(Long.valueOf(userId) != userIn.userId) {
+			if(!userIn.activationMethod.equals("facebook") && (Long.valueOf(userId) != userIn.userId)) {
 				println "Could not update.. userId did not match"
 				return null
 			}
@@ -152,6 +160,9 @@ class UserService {
 				userTypeCode = userIn.userTypeCode == null ? "" : userIn.userTypeCode // i.e. user, superuser, author, guest, auditor, placeholder (used for popular reviewers)
 				aboutMe = userIn.aboutMe == null ? "" :  userIn.aboutMe// 140 characters of text about the user
 				//activationMethod = userIn.activationMethod
+				facebookId = userIn.facebookId == null ? "" : userIn.facebookId
+				gender = userIn.gender == null ? "" : userIn.gender
+				facebookUpdateTime = userIn.facebookUpdateTime == null ? "" : userIn.facebookUpdateTime
 				return it
 			}
 			tx.success()
@@ -162,12 +173,12 @@ class UserService {
 		return u
 	}
 	
-	def updateUserPhotoUrl(userName, photoUrl) {
-		println "in updateUserPhotoUrl - userName: ${userName}, photoUrl:${photoUrl}"
+	def updateUserPhotoUrl(userId, photoUrl) {
+		println "in updateUserPhotoUrl - userId: ${userId}, photoUrl:${photoUrl}"
 		Transaction tx = graphDb.beginTx()
 		def u = null
 		try {
-			u = findUsersByProperty("userName", userName)
+			u = findUsersByProperty("id", userId)
 			if(!u)
 			{
 				println "Could not update.. user not found"
@@ -224,7 +235,7 @@ class UserService {
 		userIndex = graphDb.index().forNodes('users')
 		
 		Node userNode = null
-		if(property.equals('id') || property.equals('userName'))
+		if(property.equals('id') || property.equals('userName') || property.equals('email'))
 		{
 			IndexHits<Node> hits = userIndex.get(property, value)
 			if(hits.hasNext()) {
@@ -259,7 +270,7 @@ class UserService {
 			for(node in trav) {
 				def u = new User(node)
 				allUsers.push(u)
-				if(property.equals("id") || property.equals("userName")) {
+				if(property.equals("id") || property.equals("userName") || property.equals("email")) {
 					println "!!! adding user with property:[$property] and value:[${value}] to index !!!"
 					userIndex.add node, property, value		
 				}
@@ -314,14 +325,15 @@ class UserService {
 	}
 	
 	def signIn(userName, password) {
+		def returnString = ""
 		Transaction tx = graphDb.beginTx()
 		try { 
 			User u = findUsersByProperty("userName", userName)
 			if(!u) {
-				return "Invalid username."
+				returnString = "Invalid username."
 			}
 			else if(!u.getPassword().equals(password)) {
-				return "Incorrect password!"
+				returnString = "Incorrect password!"
 			}
 			else {
 				u.lastLoginDate = new Date().toString()
@@ -334,7 +346,66 @@ class UserService {
 		finally {
 			tx.finish()
 		}
-		return "Login successful!"
+		
+		
+		return returnString
+	}
+	
+	def signInFacebook(fbUserIn) {
+		def returnVal = null
+		println("in signInFacebook()")
+		
+		
+		def userId
+		// check for existing user by email
+		// if not exists, create user
+		// if exists, update user
+		// update last-login-date
+		
+		// TODO: Only update the bookup user if facebook's updatetime has changed
+		
+		println("looking for user with email address: " + fbUserIn.email)
+		def u = findUsersByProperty("email", fbUserIn.email)
+		if(!u) {
+			println("adding user")
+			u = addUser(fbUserIn)
+			userId = u.userId
+			returnVal = u
+		}
+		else {
+			println("updating user. ID is ${u.userId}")
+		
+			/*
+			DateTime dt = new DateTime(fbUserIn.facebookUpdateTime)
+			DateTime dt2 = new DateTime(u.facebookUpdateTime)
+			println "fbUserIn.facebookUpdateTime "
+			*/
+			DateTimeComparator dtc = DateTimeComparator.getInstance()
+			println "compare result - " + dtc.compare(dt,dt2)
+			
+			if(dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime) > 0) {
+				println "facebook update time is greater than the last recorded time in the bookup database"
+			}
+			
+			DateTimeFormatter fmt = DateTimeFormat.forPattern("MMMM, yyyy");
+			String str = fmt.print(dt);
+			println str
+			println fmt.print(dt2);
+			userId = u.userId
+			if(fbUserIn.facebookUpdateTime) {
+				// only update the username if the account was activated via facebook initially.
+				// we don't want to update the username if it was specifically set by the user upon
+				// signup
+				if(!u.activationMethod.equalsIgnoreCase('facebook')) {
+					fbUserIn.userName = u.userName
+				}
+			}
+			
+			fbUserIn.location = fbUserIn.location.name
+			returnVal = updateUser(fbUserIn, userId)
+		}
+
+		return returnVal
 	}
 	
 	def signUp(userIn) { 

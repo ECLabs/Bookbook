@@ -375,22 +375,13 @@ class UserService {
 		else {
 			println("updating user. ID is ${u.userId}")
 		
-			/*
-			DateTime dt = new DateTime(fbUserIn.facebookUpdateTime)
-			DateTime dt2 = new DateTime(u.facebookUpdateTime)
-			println "fbUserIn.facebookUpdateTime "
-			*/
 			DateTimeComparator dtc = DateTimeComparator.getInstance()
-			println "compare result - " + dtc.compare(dt,dt2)
+			println "compare result - " + dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime)
 			
 			if(dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime) > 0) {
 				println "facebook update time is greater than the last recorded time in the bookup database"
 			}
 			
-			DateTimeFormatter fmt = DateTimeFormat.forPattern("MMMM, yyyy");
-			String str = fmt.print(dt);
-			println str
-			println fmt.print(dt2);
 			userId = u.userId
 			if(fbUserIn.facebookUpdateTime) {
 				// only update the username if the account was activated via facebook initially.

@@ -82,6 +82,10 @@ class BookController {
 		render "book deleted successfully!"
 	}
 	
+	def findCheckInById = {
+		render "Find check-in by ID not yet implemented"
+	}
+	
 	def establishCheckIn = {
 		def jsonCheckIn = JSON.parse(params.jsondata)
 		render bookService.createCheckIn(jsonCheckIn, params.bookId, jsonCheckIn.userId) as JSON

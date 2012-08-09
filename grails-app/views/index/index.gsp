@@ -1,7 +1,7 @@
 <%@page import="java.awt.event.ItemEvent"%>
 <html>
     <head>
-        <title>Welcome to Grails2</title>
+        <title>BookUp Admin Console</title>
         <meta name="layout" content="main" />
         <style type="text/css" media="screen">
 
@@ -328,7 +328,7 @@
                     <g:each in="${books}" status="i" var="bookInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${bookInstance.bookId}">${fieldValue(bean: bookInstance, field: "bookId")}</g:link></td>
+                            <td><g:link action="showbook" id="${bookInstance.bookId}">${fieldValue(bean: bookInstance, field: "bookId")}</g:link></td>
                         
                             <td>${fieldValue(bean: bookInstance, field: "author")}</td>
                         
@@ -368,7 +368,7 @@
                     <g:each in="${checkIns}" status="i" var="ciInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${ciInstance.id}">${fieldValue(bean: ciInstance, field: "checkInId")}</g:link></td>
+                            <td><g:link action="showcheckin" id="${ciInstance.id}">${fieldValue(bean: ciInstance, field: "checkInId")}</g:link></td>
                         
                             <td>${fieldValue(bean: ciInstance, field: "bookId")}</td>
                         
@@ -497,7 +497,7 @@
                     <g:each in="${users}" status="i" var="userInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${userInstance.userId}">${fieldValue(bean: userInstance, field: "userId")}</g:link></td>
+                            <td><g:link action="showuser" id="${userInstance.userId}">${fieldValue(bean: userInstance, field: "userId")}</g:link></td>
                         
                             <td>${fieldValue(bean: userInstance, field: "userTypeCode")}</td>
                         
@@ -581,7 +581,7 @@
                     <g:each in="${bookLists}" status="i" var="bl">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="show" id="${bl.bookListId}">${fieldValue(bean: bl, field: "bookListId")}</g:link></td>
+                            <td><g:link action="showlist" id="${bl.bookListId}">${fieldValue(bean: bl, field: "bookListId")}</g:link></td>
                             
                             <td>${fieldValue(bean: bl, field: "type")}</td>
                         

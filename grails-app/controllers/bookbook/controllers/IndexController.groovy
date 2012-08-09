@@ -21,10 +21,24 @@ class IndexController {
 		
 
 		for(Book b in books) {
+			println "bookId - ${b.bookId}"
 			checkIns.addAll(bookService.findCheckInsByBookId(b.bookId))
 			bookLists.addAll(listService.findListsByBookId(b.bookId, ""))
 			
 		}
 
+	}
+	
+	def showuser = {
+		redirect(controller:"user", action: "findByUserId", params: [userId: params.id])
+	}
+	def showbook = {
+		redirect(controller:"book", action: "find", params: [id: params.id])
+	}
+	def showcheckin = {
+		redirect(controller:"book", action: "findCheckInById", params: [id: params.id])
+	}
+	def showlist = {
+		redirect(controller:"list", action: "findListById", params: [id: params.id])
 	}
 }

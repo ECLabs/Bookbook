@@ -51,7 +51,13 @@ class UserController {
 	 */
 	def signIn = { 
 		println "in signIn(). username --> " + params.username + " password --> " + params.password
-		render userService.signIn(params.username, params.password)
+		def returnVal = userService.signIn(params.username, params.password)
+		if(returnVal instanceof User) {
+			render returnVal as JSON
+		}
+		else {
+			render returnVal
+		}
 	}
 	
 	def signInFacebook = {
@@ -96,7 +102,14 @@ class UserController {
 	}
 	
 	def findByUserId = {
-		render userService.findUsersByProperty("id", Long.valueOf(params.userId)) as JSON
+		def returnVal = userService.findUsersByProperty("id", Long.valueOf(params.userId))
+		if(returnVal == null) {
+			render "[]"
+		}
+		else {
+			render userService.findUsersByProperty("id", Long.valueOf(params.userId)) as JSON
+		}
+					
 	}
 	
 	def update = { 

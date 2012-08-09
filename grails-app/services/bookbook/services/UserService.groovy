@@ -337,6 +337,7 @@ class UserService {
 			}
 			else {
 				u.lastLoginDate = new Date().toString()
+				returnString = u;
 			}
 			tx.success()
 		}

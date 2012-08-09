@@ -63,7 +63,7 @@ class ListController {
 	}
 	
 	def findListById = {
-		render "not yet implemented"
+		render "Find list by ID not yet implemented"
 	}
 	
 	def updateList = {

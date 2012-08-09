@@ -30,8 +30,13 @@ class UserController {
 	def add = { 		
 		println "in add(). Incoming json data is --> " + params['jsondata']
 
+		// we have to remove the return characters otherwise decodeBase64 won't work
+		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
+		println "updated json - " + jsonNoReturns
+		def jsonUser = JSON.parse(jsonNoReturns)
+		byte[] b = jsonUser.picture.decodeBase64()
+		
 		// validate that no other user with the username already exists.
-		def jsonUser = JSON.parse(params['jsondata'])
 		if(validateAddUser(jsonUser) == false) {
 			render "{field:'userName',error:'Username " + jsonUser.userName + " already exists. Please try another.'}"
 			return
@@ -41,8 +46,14 @@ class UserController {
 		println "validation checked out ok!"
 		def addedUser = userService.addUser(jsonUser)
 		if(addedUser) {
+			updatePhoto(addedUser, b)
+			
 			render addedUser as JSON
-		}				
+		}	
+		
+		
+		
+					
 	}
 	/**
 	 * Example URIs:
@@ -62,6 +73,8 @@ class UserController {
 	
 	def signInFacebook = {
 		println "in signInFacebook(). jsondata -->" + params['jsondata']
+		
+		// we have to remove the return characters otherwise decodeBase64 won't work
 		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
 		println "updated json - " + jsonNoReturns
 		def jsonUser = JSON.parse(jsonNoReturns)
@@ -69,19 +82,9 @@ class UserController {
 		def user = userService.signInFacebook(jsonUser)
 		def now = new Date()
 		
-		// Write to a file
-		def filename = user.userId + ".profilephoto.${new Date().getTime()}.png";
-		def fos= new FileOutputStream(basePhotoPath + filename)
-		fos.write(b);
-		fos.close()
-		
-		// TODO: move this into the signInFacebook() method
-		// Update user photoUrl
-		def url = basePhotoUrl + filename 
-		userService.updateUserPhotoUrl(user.userId, url)
-		
 		if(user) {
 			println "Login successful for user ${user.userName}:${user.userId}"
+			updatePhoto(user, b)
 			render user as JSON
 		} else {
 			println "Login failed - sending 403 Forbidden"
@@ -117,7 +120,7 @@ class UserController {
 		println "userId to update - ${params.userId}"
 		render userService.updateUser(jsonUser, params.userId) as JSON	
 	} 
-	
+	/*
 	def updatePhoto = {
 		println "In updatePhoto()"
 		println request.getClass()
@@ -139,6 +142,7 @@ class UserController {
 		   render 'file cannot be empty'
 		  }
 	}
+	*/
 	def remove = {
 		render userService.deleteUser(params.userName)
 	}
@@ -199,6 +203,19 @@ class UserController {
 			return false;
 		}
 		return true;
+	}
+	
+	def updatePhoto(user, b) {
+		// Write to a file
+		def filename = user.userId + ".profilephoto.${new Date().getTime()}.png";
+		def fos= new FileOutputStream(basePhotoPath + filename)
+		fos.write(b);
+		fos.close()
+		
+		// TODO: move this into the signInFacebook() method
+		// Update user photoUrl
+		def url = basePhotoUrl + filename
+		userService.updateUserPhotoUrl(user.userId, url)
 	}
 
 }

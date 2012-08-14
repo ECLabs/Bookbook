@@ -497,7 +497,7 @@
                     <g:each in="${users}" status="i" var="userInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="showuser" id="${userInstance.userId}">${fieldValue(bean: userInstance, field: "userId")}</g:link></td>
+                            <td><g:link style="text-decoration:underline;" action="showuser" id="${userInstance.userId}">${fieldValue(bean: userInstance, field: "userId")}</g:link></td>
                         
                             <td>${fieldValue(bean: userInstance, field: "userTypeCode")}</td>
                         
@@ -507,7 +507,7 @@
                         
                             <td>${fieldValue(bean: userInstance, field: "email")}</td>
                           	
-                          	<td>${fieldValue(bean: userInstance, field: "photoUrl")}</td>
+                          	<td><a style="text-decoration:underline;" href="${fieldValue(bean: userInstance, field: "photoUrl")}">${fieldValue(bean: userInstance, field: "photoUrl")}</a></td>
                           	
                           	<td>${fieldValue(bean: userInstance, field: "createDate")}</td>
                           	

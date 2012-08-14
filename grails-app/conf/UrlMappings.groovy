@@ -55,7 +55,7 @@ class UrlMappings {
 			action = [POST:"signInFacebook"]
 		}
 		
-		"/api/user/$userName/photo"(controller:"user"){
+		"/api/user/$userId/photo"(controller:"user"){
 			action = [POST:"updatePhoto"]
 		}
 		

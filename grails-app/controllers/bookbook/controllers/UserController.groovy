@@ -47,7 +47,6 @@ class UserController {
 		def addedUser = userService.addUser(jsonUser)
 		if(addedUser) {
 			updatePhoto(addedUser, b)
-			
 			render addedUser as JSON
 		}	
 		
@@ -120,14 +119,14 @@ class UserController {
 		println "userId to update - ${params.userId}"
 		render userService.updateUser(jsonUser, params.userId) as JSON	
 	} 
-	/*
+	
 	def updatePhoto = {
 		println "In updatePhoto()"
 		println request.getClass()
 		
 		def f = request.getFile("myFile");
-		  if(!f.empty) {
-			  println "success getting file"
+		if(!f.empty) {
+			println "success getting file"
 			flash.message = 'success'
 			def suffix = params.userId + ".profilephoto.${new Date().getTime()}.png";
 			def path = basePhotoPath + suffix
@@ -136,13 +135,14 @@ class UserController {
 			
 			// update the photoUrl on the user record
 			userService.updateUserPhotoUrl(params.userId, url)
-			render ""
-		  }
-		  else {
-		   render 'file cannot be empty'
-		  }
+			render "Success!"
+		}
+		else {
+			render 'file cannot be empty'
+		}
+		 
 	}
-	*/
+	
 	def remove = {
 		render userService.deleteUser(params.userName)
 	}

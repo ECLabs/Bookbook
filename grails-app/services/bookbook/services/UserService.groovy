@@ -376,15 +376,21 @@ class UserService {
 		else {
 			println("updating user. ID is ${u.userId}")
 		
-			DateTimeComparator dtc = DateTimeComparator.getInstance()
-			println "compare result - " + dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime)
-			
-			if(dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime) > 0) {
-				println "facebook update time is greater than the last recorded time in the bookup database"
+			boolean updateUser = false
+			if(!u.facebookUpdateTime) {
+				updateUser = true
+			}
+			else {
+				DateTimeComparator dtc = DateTimeComparator.getInstance()
+				println "compare result - " + dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime)
+				
+				if(dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime) > 0) {
+					updateUser = true
+					println "facebook update time is greater than the last recorded time in the bookup database"
+				}
 			}
 			
-			userId = u.userId
-			if(fbUserIn.facebookUpdateTime) {
+			if(updateUser) {
 				// only update the username if the account was activated via facebook initially.
 				// we don't want to update the username if it was specifically set by the user upon
 				// signup
@@ -393,8 +399,9 @@ class UserService {
 				}
 			}
 			
+			userId = u.userId
 			fbUserIn.location = fbUserIn.location.name
-			returnVal = updateUser(fbUserIn, userId)
+			returnVal = this.updateUser(fbUserIn, userId)
 		}
 
 		return returnVal

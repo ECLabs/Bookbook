@@ -87,7 +87,7 @@ class UserController {
 			render user as JSON
 		} else {
 			println "Login failed - sending 403 Forbidden"
-			response.sendError(HttpServletResponse.SC_FORBIDDEN)
+			response.sendError(javax.servlet.http.HttpServletResponse.SC_FORBIDDEN)
 		}
 	}
 	
@@ -175,7 +175,7 @@ class UserController {
 	}
 	
 	def establishCheckIn = {
-		def jsonCheckIn = JSON.parse(params.jsondata)
+		def jsonCheckIn = params.jsondata
 		println "username is ${params.userName}"
 		render bookService.createCheckIn(jsonCheckIn, jsonCheckIn.bookId, params.userName)
 	}

@@ -353,7 +353,6 @@ class UserService {
 	}
 	
 	def signInFacebook(fbUserIn) {
-		def returnVal = null
 		println("in signInFacebook()")
 		
 		
@@ -364,14 +363,13 @@ class UserService {
 		// update last-login-date
 		
 		// TODO: Only update the bookup user if facebook's updatetime has changed
-		
+		fbUserIn.location = fbUserIn.location.name
 		println("looking for user with email address: " + fbUserIn.email)
 		def u = findUsersByProperty("email", fbUserIn.email)
 		if(!u) {
 			println("adding user")
 			u = addUser(fbUserIn)
 			userId = u.userId
-			returnVal = u
 		}
 		else {
 			println("updating user. ID is ${u.userId}")
@@ -397,14 +395,16 @@ class UserService {
 				if(!u.activationMethod.equalsIgnoreCase('facebook')) {
 					fbUserIn.userName = u.userName
 				}
+				userId = u.userId
+				fbUserIn.aboutMe = u.aboutMe
+				fbUserIn.fullName = u.fullName
+				u = this.updateUser(fbUserIn, userId)
 			}
 			
-			userId = u.userId
-			fbUserIn.location = fbUserIn.location.name
-			returnVal = this.updateUser(fbUserIn, userId)
+			
 		}
 
-		return returnVal
+		return u
 	}
 	
 	def signUp(userIn) { 

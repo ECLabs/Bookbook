@@ -115,7 +115,16 @@ class UserController {
 	}
 	
 	def update = { 
-		def jsonUser = JSON.parse(params.jsondata)
+		// we have to remove the return characters otherwise decodeBase64 won't work
+		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
+		println "updated json - " + jsonNoReturns
+		def jsonUser = JSON.parse(jsonNoReturns)
+		
+		if(jsonUser.picture) {
+			byte[] b = jsonUser.picture.decodeBase64()
+			jsonUser.photoUrl = updatePhoto(jsonUser.userId, b)
+		}
+		
 		println "userId to update - ${params.userId}"
 		render userService.updateUser(jsonUser, params.userId) as JSON	
 	} 

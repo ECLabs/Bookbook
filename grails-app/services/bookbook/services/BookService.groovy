@@ -157,7 +157,7 @@ class BookService {
 							pos.currentNode().getProperty(property, null).toLowerCase().contains(value.toLowerCase())
 					}
 					return !pos.isStartNode() &&
-						pos.currentNode().getProperty(property, null).equals(value)
+						pos.currentNode().getProperty(property, null).replaceFirst("^0+", "").equals(value)
 				}
 			},
 			RelTypes.BOOK, Direction.OUTGOING
@@ -188,9 +188,13 @@ class BookService {
 	
 	def addBook(GoogleBook b) {
 		println "in addBook()"
+		
 		Transaction tx = graphDb.beginTx()
 		try {
-			// first check to see if the book was already added
+			// strip any leading 0's on the ISBN appropriately before saving and comparing
+			b.isbn10 = b.isbn10.replaceFirst("^0+", "")
+			
+			// check to see if the book was already added
 			def matches = findBooksByProperty("isbn10", b.isbn10).size()
 			if(matches > 0)
 			{
@@ -218,9 +222,13 @@ class BookService {
 	}
 	
 	def updateBook(GoogleBook b, id) {
-		println "in updateBook() - b.bookId = ${b.bookId} & id = ${id}"
+		println "in updateBook() - b.bookId = ${b.bookId} & id = ${id}"	
+		
 		Transaction tx = graphDb.beginTx()
-		try {
+		try {			
+			// strip any leading 0's on the ISBN appropriately before saving and comparing
+			b.isbn10 = b.isbn10.replaceFirst("^0+", "")
+			
 			def bookId = b.bookId
 			// make sure the id matches
 			if(!id.equals(bookId)) {
@@ -450,19 +458,11 @@ class BookService {
 
 				for(ident in book.volumeInfo.industryIdentifiers) {
 					if(ident.type == 'ISBN_10') {
-						isbn = ident.identifier
+						isbn = ident.identifier.replaceFirst("^0+", "") // strip leading zeros
 						break
 					}
 				}
 				if(isbn) {
-					// if the book already exists in the DB, get the bookId
-					/*
-					def existingBooks = findBooksByProperty("isbn10", isbn)
-					if(existingBooks) {
-						existingBookId = existingBooks[0].getBookId();
-					}
-					*/
-						
 					Transaction tx = graphDb.beginTx()
 					try {		
 						filteredBookList.push new GoogleBook (

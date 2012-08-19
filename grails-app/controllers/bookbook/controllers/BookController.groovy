@@ -137,13 +137,15 @@ class BookController {
 		
 		// add the books into a Map so we can eliminate duplicates - preferences for books with BookUp IDs
 		for(Book book in externals) {
-			if(combined[(book.isbn10)]) { // if the book is already in the map, see if we need to replace it
+			def isbn = book.isbn10.replaceFirst("^0+", "") // strip leading zeros from ISBN first - comes from Google with a leading zero
+			//book.isbn10 = book.isbn10.replaceFirst("^0+", "") 
+			if(combined[(isbn)]) { // if the book is already in the map, see if we need to replace it
 				if(book.getBookId() != null) { // replace with this one, prefer the one with an ID
-					combined[(book.isbn10)] = book
+					combined[(isbn)] = book
 				}
 			}
 			else {
-				combined.put(book.isbn10, book)
+				combined.put(isbn, book)
 			}
 			
 		}

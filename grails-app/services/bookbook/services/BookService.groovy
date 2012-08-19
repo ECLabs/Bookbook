@@ -137,6 +137,9 @@ class BookService {
 				}
 			}
 			
+			//The comparator in the traversal below needs value to be a Long
+			value = Long.valueOf(value);
+			
 		}
 		
 		Node brefNode = getBooksReferenceNode()
@@ -148,7 +151,7 @@ class BookService {
 					println "current value = " + pos.currentNode().getProperty(property, null)
 
 					return !pos.isStartNode() &&
-						pos.currentNode().getProperty(property, null).equals(Long.valueOf(value))
+						pos.currentNode().getProperty(property, null).equals(value)
 				}
 			},
 			RelTypes.BOOK, Direction.OUTGOING
@@ -186,7 +189,7 @@ class BookService {
 			if(matches > 0)
 			{
 				println "Could not add book.  $matches Book(s) with isbn10 of ${b.isbn10} already exist"
-				return null
+				return -1
 			}
 			
 			BookFactory bookFactory = new BookFactory(graphDb)

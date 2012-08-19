@@ -3,6 +3,7 @@ package bookbook.controllers
 import bookbook.domain.GoogleBook
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
+import javax.servlet.http.HttpServletRequest
 
 class BookController {
 
@@ -54,12 +55,12 @@ class BookController {
 		def jsonBook = JSON.parse(params['jsondata'])
 		def newGoogleBook = new GoogleBook(jsonBook)
 		def addedBook = bookService.addBook(newGoogleBook)
-		if(addedBook)
-			render "book added successfully!"
+		if(addedBook == -1) // duplicate
+			response.sendError(javax.servlet.http.HttpServletResponse.SC_CONFLICT) // 409
+		else if (addedBook)
+			render addedBook as JSON
 		else
-			render "book could not be added"
-
-		
+			response.sendError(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR) // 500 
 	}
 	
 	def update = {
@@ -70,9 +71,7 @@ class BookController {
 		
 		def updatedBook = bookService.updateBook(googleBook, Long.valueOf(params.id))
 		if(updatedBook)
-			render "book updated successfully!"
-		else
-			render "book could not be updated"
+			render updatedBook as JSON
 	}
 	
 	def remove = {

@@ -58,8 +58,19 @@
         		$.ajax({
         			url: url,
         			type: "POST",
+        			statusCode: {
+    					409: function() {
+      						alert("Attempt to add a duplicate book - another with the same ISBN already exists.");
+    					},
+    					500: function() {
+      						alert("BookUp is having problems... see the application log for more details.");
+    					}
+  					},
         			data: {jsondata : $('#jsondata_addbook').val() }
-        		}).done(function(msg) { alert("data saved" + msg); });
+        		}).done(function(msg) { alert("data saved" + msg); })
+        		.fail(function(jqXHR, textStatus) {
+				  alert( "Request failed: " + textStatus );
+				});;
         	}
         	
         	function addUser() {

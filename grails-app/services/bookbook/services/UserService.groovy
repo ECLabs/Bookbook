@@ -84,7 +84,8 @@ class UserService {
 			if(userTypeCode) {
 				userType = userTypeCode
 			}
-			// TODO: strong password restrictions	
+			// TODO: strong password restrictions
+			// TODO: only allow one user with a given username, email address, or facebookId
 		}
 		
 		User u = null

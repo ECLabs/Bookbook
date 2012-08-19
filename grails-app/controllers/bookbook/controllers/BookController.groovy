@@ -33,7 +33,7 @@ class BookController {
 		/**
 		 * Check to see if this is a query
 		 */
-		if(params.isbn10 || params.title || params.author) {
+		if(params.size() > 2) { // action and controller are default params
 			println "still in findAll() - this is a search operation"
 			def books = findAllSources(params)
 			if(books && books == -1) { // invalid query

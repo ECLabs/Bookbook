@@ -435,6 +435,7 @@ class BookService {
 		def bookList = bookData.items;
 		def filteredBookList = [];
 		for(book in bookList)  {
+			def existingBookId = null
 			if(	book.volumeInfo.description &&
 				book.volumeInfo.imageLinks &&
 				book.volumeInfo.authors &&
@@ -448,6 +449,12 @@ class BookService {
 					}
 				}
 				if(isbn) {
+					// if the book already exists in the DB, get the bookId
+					def existingBooks = findBooksByProperty("isbn10", isbn)
+					if(existingBooks) {
+						existingBookId = existingBooks[0].getBookId();
+					}
+						
 					Transaction tx = graphDb.beginTx()
 					try {		
 						filteredBookList.push new GoogleBook (
@@ -457,8 +464,8 @@ class BookService {
 							isbn10:isbn,
 							smallThumbnailUrl:book.volumeInfo.imageLinks.smallThumbnail,
 							thumbnailUrl:book.volumeInfo.imageLinks.thumbnail,
-							createDate:(new Date()).toString() )
-
+							bookId:existingBookId,
+							createDate:(new Date()).toString())
 						tx.success()
 					}
 					finally {

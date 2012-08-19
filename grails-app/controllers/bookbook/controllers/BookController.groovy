@@ -1,6 +1,9 @@
 package bookbook.controllers
 
+import java.text.Normalizer.Form;
+
 import bookbook.domain.GoogleBook
+import bookbook.domain.Book
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import javax.servlet.http.HttpServletRequest
@@ -14,7 +17,7 @@ class BookController {
 		render "I'm alive!  The current time is " + new Date()
 	}
 	
-	def find = {
+	def findById = {
 		println "in find"
 		def results = ""
 
@@ -25,28 +28,29 @@ class BookController {
 		
 	}
 	
-	def findExternal = {
-		println "in findExternal(). Parameters are ${params.toString()}"
-		def results
-		if(params.isbn10)
-			results = bookService.findBooksByProperty("isbn10", params.isbn10);
-		else if(params.title)
-			results = bookService.findGoogleBooksByTitle(params.title, params.page);
-		else if(params.author)
-			results = bookService.findGoogleBooksByAuthor(params.author, params.page);
-		else {
-			render "Invalid query"
-			return;
-		}
-		render results as JSON
-	}
-	
-	def findAll = {
+	def find = {
 		println "in findAll()"
-		def results = bookService.findAllBooks()
-		def conv = results as JSON
-		conv.prettyPrint = true
-		render conv.toString()
+		/**
+		 * Check to see if this is a query
+		 */
+		if(params.isbn10 || params.title || params.author) {
+			println "still in findAll() - this is a search operation"
+			def books = findAllSources(params)
+			if(books && books == -1) { // invalid query
+				response.sendError(javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST) // 400
+			}
+			else if(books) {
+				render books as JSON
+				return
+			}
+			else {
+				// TODO: wrap this stuff in exception handlers so we don't have to include in every function
+				response.sendError(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR) // 400
+			}
+			
+		}
+		// otherwise, just return all books
+		render bookService.findAllBooks() as JSON
 	}
 	
 	def add = {
@@ -106,7 +110,49 @@ class BookController {
 			longitude : "34 West")
 		render dummy as JSON
 	}
+	def findAllSources(parameters) {
+		println "in findAllSources(). Parameters are ${params.toString()}"
+		def externals = []
+		def internals = []
+		def combined = [:]
+		
+		if(parameters.isbn10) {
+			externals = bookService.findGoogleBooks("isbn", parameters.isbn10, 0, 10)
+			internals = bookService.findBooksByProperty("isbn10", parameters.isbn10)
+		}
+		else if(parameters.title) {
+			externals = bookService.findGoogleBooksByTitle(parameters.title, parameters.page)
+			internals = bookService.findBooksByProperty("title", parameters.title)
+		}
+		else if(parameters.author) {
+			externals = bookService.findGoogleBooksByAuthor(parameters.author, parameters.page)
+			internals = bookService.findBooksByProperty("author", parameters.author)
+		}
+		else {
+			return -1; // invalid query
+		}
+		
+		// combine into one list
+		externals.addAll(internals)
+		
+		// add the books into a Map so we can eliminate duplicates - preferences for books with BookUp IDs
+		for(Book book in externals) {
+			if(combined[(book.isbn10)]) { // if the book is already in the map, see if we need to replace it
+				if(book.getBookId() != null) { // replace with this one, prefer the one with an ID
+					combined[(book.isbn10)] = book
+				}
+			}
+			else {
+				combined.put(book.isbn10, book)
+			}
+			
+		}
+		
+		render combined.values() as JSON
+	}
 }
+
+
 
 class DummyCheckIn {
 	def id

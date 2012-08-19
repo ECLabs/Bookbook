@@ -3,6 +3,9 @@ package bookbook.services
 import static groovyx.net.http.ContentType.JSON
 import static groovyx.net.http.ContentType.TEXT
 import static groovyx.net.http.ContentType.URLENC
+
+import java.beans.java_awt_BorderLayout_PersistenceDelegate;
+
 import groovyx.net.http.HTTPBuilder
 
 import javax.annotation.PostConstruct
@@ -149,7 +152,10 @@ class BookService {
 				public boolean isReturnableNode( TraversalPosition pos )
 				{
 					println "current value = " + pos.currentNode().getProperty(property, null)
-
+					if(value instanceof java.lang.String && !property.toLowerCase().equals("isbn")) {
+						return !pos.isStartNode() &&
+							pos.currentNode().getProperty(property, null).toLowerCase().contains(value.toLowerCase())
+					}
 					return !pos.isStartNode() &&
 						pos.currentNode().getProperty(property, null).equals(value)
 				}
@@ -450,10 +456,12 @@ class BookService {
 				}
 				if(isbn) {
 					// if the book already exists in the DB, get the bookId
+					/*
 					def existingBooks = findBooksByProperty("isbn10", isbn)
 					if(existingBooks) {
 						existingBookId = existingBooks[0].getBookId();
 					}
+					*/
 						
 					Transaction tx = graphDb.beginTx()
 					try {		

@@ -7,19 +7,16 @@ class UrlMappings {
 		 */
 		
 		"/api/book"(controller:"book"){
-			action = [GET:"findAll", POST:"add"]
+			action = [GET:"find", POST:"add"]
 		}
 		
 		"/api/book/$id"(controller:"book"){
-			action = [GET:"find", PUT:"update", DELETE:"remove"]
+			action = [GET:"findById", PUT:"update", DELETE:"remove"]
 		}
 		
-		"/api/book/external"(controller:"book"){
-			action = [GET:"findExternal"]
-		}
-		
+		// TODO: remove this... just need to make sure its not called anywhere first
 		"/api/book/all"(controller:"book"){
-			action = [GET:"findAll"]
+			action = [GET:"find"]
 		}
 		
 		// TODO: remove when we have DELETE/PUT working

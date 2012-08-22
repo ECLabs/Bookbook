@@ -58,7 +58,6 @@ class ListController {
 		def userId = params['userId']
 		
 		listService.addListEntry(userId, l.bookId, l.listType, l.title)
-		println "done"
 		render "done"
 	}
 	

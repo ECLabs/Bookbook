@@ -18,7 +18,7 @@ class BookController {
 	}
 	
 	def findById = {
-		println "in find"
+		log.info "in findById()"
 		def results = ""
 
 		if(params.id)
@@ -29,12 +29,12 @@ class BookController {
 	}
 	
 	def find = {
-		println "in findAll()"
+		log.info "in find()"
 		/**
 		 * Check to see if this is a query
 		 */
 		if(params.size() > 2) { // action and controller are default params
-			println "still in findAll() - this is a search operation"
+			log.debug "still in findAll() - this is a search operation"
 			def books = findAllSources(params)
 			if(books && books == -1) { // invalid query
 				response.sendError(javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST) // 400
@@ -54,7 +54,7 @@ class BookController {
 	}
 	
 	def add = {
-		println "in add(). Json Data is --> " + params['jsondata']
+		log.info "in add(). Json Data is --> " + params['jsondata']
 
 		def jsonBook = JSON.parse(params['jsondata'])
 		def newGoogleBook = new GoogleBook(jsonBook)
@@ -68,7 +68,7 @@ class BookController {
 	}
 	
 	def update = {
-		println "in BookController.update(). Json Data is --> ${params.jsondata}. id is ${params.id}"
+		log.info "in BookController.update(). Json Data is --> ${params.jsondata}. id is ${params.id}"
 		
 		def jsonBook = JSON.parse(params.jsondata)
 		def googleBook = new GoogleBook(jsonBook)
@@ -79,7 +79,7 @@ class BookController {
 	}
 	
 	def remove = {
-		println "in BookController.remove(). id is --> " + params.id
+		log.info "in BookController.remove(). id is --> " + params.id
 		
 		bookService.deleteBook(params.id)
 		render "book deleted successfully!"
@@ -111,7 +111,8 @@ class BookController {
 		render dummy as JSON
 	}
 	def findAllSources(parameters) {
-		println "in findAllSources(). Parameters are ${params.toString()}"
+		log.info "in findAllSources(). Parameters are ${params.toString()}"
+		
 		def externals = []
 		def internals = []
 		def combined = [:]

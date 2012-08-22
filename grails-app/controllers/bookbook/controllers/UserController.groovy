@@ -28,11 +28,11 @@ class UserController {
 	}
 	
 	def add = { 		
-		println "in add(). Incoming json data is --> " + params['jsondata']
+		log.info "in add(). Incoming json data is --> " + params['jsondata']
 
 		// we have to remove the return characters otherwise decodeBase64 won't work
 		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
-		println "updated json - " + jsonNoReturns
+		log.debug "updated json - " + jsonNoReturns
 		def jsonUser = JSON.parse(jsonNoReturns)
 		byte[] b = jsonUser.picture.decodeBase64()
 		
@@ -43,7 +43,7 @@ class UserController {
 		}
 		
 		// all is good.. add the user
-		println "validation checked out ok!"
+		log.debug "validation checked out ok!"
 		def addedUser = userService.addUser(jsonUser)
 		if(addedUser) {
 			updatePhoto(addedUser.userId, b)
@@ -60,7 +60,7 @@ class UserController {
 	 * /user/jgarland/follow?targetUserName=rjevans&follow-action=create
 	 */
 	def signIn = { 
-		println "in signIn(). username --> " + params.username + " password --> " + params.password
+		log.info "in signIn(). username --> " + params.username + " password --> " + params.password
 		def returnVal = userService.signIn(params.username, params.password)
 		if(returnVal instanceof User) {
 			render returnVal as JSON
@@ -71,22 +71,22 @@ class UserController {
 	}
 	
 	def signInFacebook = {
-		println "in signInFacebook(). jsondata -->" + params['jsondata']
+		log.info "in signInFacebook(). jsondata -->" + params['jsondata']
 		
 		// we have to remove the return characters otherwise decodeBase64 won't work
 		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
-		println "updated json - " + jsonNoReturns
+		log.debug "updated json - " + jsonNoReturns
 		def jsonUser = JSON.parse(jsonNoReturns)
 		byte[] b = jsonUser.picture.decodeBase64()
 		def user = userService.signInFacebook(jsonUser)
 		def now = new Date()
 		
 		if(user) {
-			println "Login successful for user ${user.userName}:${user.userId}"
+			log.info "Login successful for user ${user.userName}:${user.userId}"
 			updatePhoto(user.userId, b)
 			render user as JSON
 		} else {
-			println "Login failed - sending 403 Forbidden"
+			log.info "Login failed - sending 403 Forbidden"
 			response.sendError(javax.servlet.http.HttpServletResponse.SC_FORBIDDEN)
 		}
 	}
@@ -117,7 +117,7 @@ class UserController {
 	def update = { 
 		// we have to remove the return characters otherwise decodeBase64 won't work
 		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
-		println "updated json - " + jsonNoReturns
+		log.debug "updated json - " + jsonNoReturns
 		def jsonUser = JSON.parse(jsonNoReturns)
 		
 		if(jsonUser.picture) {
@@ -125,17 +125,16 @@ class UserController {
 			jsonUser.photoUrl = updatePhoto(jsonUser.userId, b)
 		}
 		
-		println "userId to update - ${params.userId}"
+		log.debug "userId to update - ${params.userId}"
 		render userService.updateUser(jsonUser, params.userId) as JSON	
 	} 
 	
 	def updatePhoto = {
-		println "In updatePhoto()"
-		println request.getClass()
+		log.info "In updatePhoto()"
 		
 		def f = request.getFile("myFile");
 		if(!f.empty) {
-			println "success getting file"
+			log.info "success getting file"
 			flash.message = 'success'
 			def suffix = params.userId + ".profilephoto.${new Date().getTime()}.png";
 			def path = basePhotoPath + suffix
@@ -185,7 +184,7 @@ class UserController {
 	
 	def establishCheckIn = {
 		def jsonCheckIn = params.jsondata
-		println "username is ${params.userName}"
+		log.info "establishing checkin for username ${params.userName}"
 		render bookService.createCheckIn(jsonCheckIn, jsonCheckIn.bookId, params.userName)
 	}
 	
@@ -207,7 +206,7 @@ class UserController {
 	
 	def validateAddUser(user) {
 		def userCount = userService.findNumberOfUsersByUserName(user.userName)
-		println "Number of users with username $user.userName: $userCount"
+		log.debug "Number of users with username $user.userName: $userCount"
 		if(userCount > 0) {
 			return false;
 		}

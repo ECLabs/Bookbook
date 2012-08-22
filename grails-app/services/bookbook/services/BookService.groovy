@@ -23,12 +23,16 @@ import org.neo4j.graphdb.Traverser.Order
 import org.neo4j.graphdb.index.*
 import org.neo4j.kernel.EmbeddedGraphDatabase
 
+import org.apache.commons.logging.LogFactory
+
 import bookbook.domain.Book
 import bookbook.domain.CheckIn
 import bookbook.domain.GoogleBook
 import bookbook.domain.User
 
 class BookService {
+	
+	private static final log = LogFactory.getLog(this)
 
 	// Google Books API Oauth2
     static transactional = false
@@ -52,7 +56,7 @@ class BookService {
 	
 	@PostConstruct
 	def initialize() {
-		println "############### initialize() in BookService - Loading graphDb, shutdownHook."
+		log.debug "############### initialize() in BookService - Loading graphDb, shutdownHook."
 		//graphDb = new EmbeddedGraphDatabase( DB_PATH );
 		//registerShutdownHook();
 		
@@ -60,7 +64,7 @@ class BookService {
 	
 	@PreDestroy
 	def cleanUp() {
-		println "############### cleanUp()  - Shutting down graphDb."
+		log.debug "############### cleanUp()  - Shutting down graphDb."
 		//graphDb.shutdown();
 	}
 	
@@ -117,13 +121,13 @@ class BookService {
 		for(node in trav) {
 			allBooks.push(new Book(node))
 		}
-		println "got this number of books" + allBooks.size()
+		log.debug "got this number of books" + allBooks.size()
 		return allBooks
 	}
 	
 	
 	def findBooksByProperty(property, value) {
-		println "in findBooksByProperty(), looking for property [ $property ] with value [ $value ]"
+		log.debug "in findBooksByProperty(), looking for property [ $property ] with value [ $value ]"
 		
 		def bookIndex = graphDb.index().forNodes('books')
 		if(property.equals('id'))
@@ -134,7 +138,7 @@ class BookService {
 				hits.close()
 				if(bookNode)
 				{
-					println "### book found in index ###"
+					log.debug "### book found in index ###"
 					def book = new Book(bookNode)
 					return book
 				}
@@ -151,7 +155,7 @@ class BookService {
 			{
 				public boolean isReturnableNode( TraversalPosition pos )
 				{
-					println "current value = " + pos.currentNode().getProperty(property, null)
+					log.debug "current value = " + pos.currentNode().getProperty(property, null)
 					if(value instanceof java.lang.String && !property.toLowerCase().equals("isbn")) {
 						return !pos.isStartNode() &&
 							pos.currentNode().getProperty(property, null).toLowerCase().contains(value.toLowerCase())
@@ -171,7 +175,7 @@ class BookService {
 				def book = new Book(node)
 				allBooks.push(book)
 				if(property.equals("id")) {
-					println "!!! adding book with id [${book.bookId}] to index !!!"
+					log.debug "!!! adding book with id [${book.bookId}] to index !!!"
 					bookIndex.add node, property, book.bookId		
 				}
 					
@@ -182,12 +186,12 @@ class BookService {
 			tx.finish()
 		}
 		
-		println "found ${allBooks.size()}"
+		log.debug "found ${allBooks.size()}"
 		return allBooks
 	}
 	
 	def addBook(GoogleBook b) {
-		println "in addBook()"
+		log.debug "in addBook()"
 		
 		Transaction tx = graphDb.beginTx()
 		try {
@@ -198,7 +202,7 @@ class BookService {
 			def matches = findBooksByProperty("isbn10", b.isbn10).size()
 			if(matches > 0)
 			{
-				println "Could not add book.  $matches Book(s) with isbn10 of ${b.isbn10} already exist"
+				log.debug "Could not add book.  $matches Book(s) with isbn10 of ${b.isbn10} already exist"
 				return -1
 			}
 			
@@ -222,7 +226,7 @@ class BookService {
 	}
 	
 	def updateBook(GoogleBook b, id) {
-		println "in updateBook() - b.bookId = ${b.bookId} & id = ${id}"	
+		log.debug "in updateBook() - b.bookId = ${b.bookId} & id = ${id}"	
 		
 		Transaction tx = graphDb.beginTx()
 		try {			
@@ -232,7 +236,7 @@ class BookService {
 			def bookId = b.bookId
 			// make sure the id matches
 			if(!id.equals(bookId)) {
-				println "Could not update.. id did not match"
+				log.debug "Could not update.. id did not match"
 				return null
 			}
 			
@@ -240,7 +244,7 @@ class BookService {
 			def bookbook = findBooksByProperty("id", b.bookId)
 			if(!bookbook)
 			{
-				println "Could not update.. book not found"
+				log.debug "Could not update.. book not found"
 				return null
 			} 
 			
@@ -265,19 +269,19 @@ class BookService {
 	}
 	
 	def deleteBook(bookId) {
-		println "in deleteBook() with id [ $bookId ] "
+		log.debug "in deleteBook() with id [ $bookId ] "
 		Transaction tx = graphDb.beginTx()
 		try {
 			// get the book
 			def bookbook = findBooksByProperty("id", bookId)
 			if(!bookbook)
 			{
-				println "Could not delete.. book not found"
+				log.debug "Could not delete.. book not found"
 				return null
 			}
 			
 			// delete node
-			println "Deleting book from graph"
+			log.debug "Deleting book from graph"
 			bookbook.underlyingNode.delete()
 			for(rel in bookbook.underlyingNode.getRelationships())
 			{
@@ -285,7 +289,7 @@ class BookService {
 			}
 			
 			// delete node from index
-			println "Deleting book from index"
+			log.debug "Deleting book from index"
 			def bookIndex = graphDb.index().forNodes("books")
 			bookIndex.remove(bookbook.underlyingNode)
 			
@@ -298,7 +302,7 @@ class BookService {
 	
 	def createCheckIn(data, bookId, userId) {
 		
-		println "data-" + data.toString()
+		log.debug "data-" + data.toString()
 		CheckIn ci = null
 		User u = userService.findUsersByProperty("id", userId)
 		Book b = this.findBooksByProperty("id", bookId)
@@ -306,13 +310,13 @@ class BookService {
 		// check for existing relationship
 		/* allow more than one check-in for the same book/user combo
 		def existingCheckIns = u.underlyingNode.getRelationships(RelTypes.CHECK_IN, Direction.OUTGOING)
-		println "existingCheckIns: ${existingCheckIns}"
+		log.debug "existingCheckIns: ${existingCheckIns}"
 		for(checkInRel in existingCheckIns) {
 			
-			println "relationship bookId [${checkInRel.getEndNode()}]"
+			log.debug "relationship bookId [${checkInRel.getEndNode()}]"
 			if(checkInRel.getEndNode().equals(b.underlyingNode)) {
 				// check-in already exists
-				println "check-in already exists between book:[${b.bookId}] and user:[${u.userId}]"
+				log.debug "check-in already exists between book:[${b.bookId}] and user:[${u.userId}]"
 				return false
 			}
 		}
@@ -330,7 +334,7 @@ class BookService {
 				longitude = data.longitude
 				return it
 			}
-			println "checkinobject:" + ci
+			log.debug "checkinobject:" + ci
 			
 			// get id
 			def counter = null;
@@ -349,19 +353,19 @@ class BookService {
 			
 			// add to index
 			def checkInIndex = graphDb.index().forRelationships("checkIns")
-			println "adding checkin to index - checkInId: ${ci.checkInId}"
+			log.debug "adding checkin to index - checkInId: ${ci.checkInId}"
 			checkInIndex.add(ci.underlyingRel, "id", counter)
 			tx.success()
 		}
 		catch(e) {
 			tx.failure()
-			println e.toString()
+			log.error e.toString()
 			return false
 		}
 		finally {
 			tx.finish()
 		}
-		println "checkin successful."
+		log.debug "checkin successful."
 		return ci
 	}
 	
@@ -374,7 +378,7 @@ class BookService {
 			CheckIn ci = new CheckIn(rel)
 			allCheckIns.push(ci)
 		}
-		println "found [${allCheckIns.size()}] check-ins in index for user with userName [${u.userName}]"
+		log.debug "found [${allCheckIns.size()}] check-ins in index for user with userName [${u.userName}]"
 		if(allCheckIns.size())
 		{
 			return allCheckIns
@@ -386,7 +390,7 @@ class BookService {
 			CheckIn ci = new CheckIn(rel2)
 			allCheckIns2.push(ci)
 		}
-		println "found [${allCheckIns2.size()}] check-ins in graph for user with userName [${u.userName}]"
+		log.debug "found [${allCheckIns2.size()}] check-ins in graph for user with userName [${u.userName}]"
 		
 		return allCheckIns2
 	}
@@ -400,7 +404,7 @@ class BookService {
 			CheckIn ci = new CheckIn(rel)
 			allCheckIns.push(ci)
 		}
-		println "found [${allCheckIns.size()}] check-ins for book [${b.title}]"
+		log.debug "found [${allCheckIns.size()}] check-ins for book [${b.title}]"
 		
 		def allCheckIns2 = []
 		def rels2 = b.underlyingNode.getRelationships(RelTypes.CHECK_IN, Direction.INCOMING)
@@ -408,7 +412,7 @@ class BookService {
 			CheckIn ci = new CheckIn(rel2)
 			allCheckIns2.push(ci) // .equals() doesn't allow duplicates
 		}
-		println "found [${allCheckIns2.size()}] check-ins in graph for book with bookId [${b.bookId}]"
+		log.debug "found [${allCheckIns2.size()}] check-ins in graph for book with bookId [${b.bookId}]"
 		
 		return allCheckIns 
 	}
@@ -424,7 +428,7 @@ class BookService {
 		}
 		catch(e) {
 			tx.failure()
-			println e.toString()
+			log.error e.toString()
 			return false
 		}
 		finally {

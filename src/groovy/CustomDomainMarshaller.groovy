@@ -26,7 +26,6 @@ public class CustomDomainMarshaller implements ObjectMarshaller<JSON> {
             def properties = BeanUtils.getPropertyDescriptors(o.getClass());
             for (property in properties) {
                 String name = property.getName();
-				println "marshalling property --> " + name;
                 if(!EXCLUDED.contains(name)) {
                     def readMethod = property.getReadMethod();
                     if (readMethod != null) {
@@ -39,7 +38,6 @@ public class CustomDomainMarshaller implements ObjectMarshaller<JSON> {
             
 			Field[] fields = o.getClass().getDeclaredFields();
 			for (Field field : fields) {
-				println "marshalling field --> " + field.getName();
  				int modifiers = field.getModifiers();
 				if (Modifier.isPublic(modifiers)
 					&& !(Modifier.isStatic(modifiers)

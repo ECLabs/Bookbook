@@ -18,9 +18,10 @@ import org.neo4j.graphdb.Traverser.Order
 import org.neo4j.graphdb.index.IndexHits
 import bookbook.domain.User
 import bookbook.domain.User2
+import org.apache.commons.logging.LogFactory
 
 class UserService {
-
+	private static final log = LogFactory.getLog(this)
     static transactional = true
 	
 	//neo4j
@@ -31,7 +32,7 @@ class UserService {
 
 	@PostConstruct
 	def initialize() {
-		println "############### initialize() in UserService- Loading graphDb, shutdownHook."
+		log.debug "############### initialize() in UserService- Loading graphDb, shutdownHook."
 		//graphDb = new EmbeddedGraphDatabase( DB_PATH );
 		userIndex = graphDb.index().forNodes("users")
 		//registerShutdownHook();
@@ -39,7 +40,7 @@ class UserService {
 	
 	@PreDestroy
 	def cleanUp() {
-		println "############### cleanUp()  - Shutting down graphDb."
+		log.debug "############### cleanUp()  - Shutting down graphDb."
 		//graphDb.shutdown();
 	}
 	
@@ -72,13 +73,13 @@ class UserService {
 	}
 		
 	def addUser(userIn) {
-		//println "in AddUser - graphdb" + graphDb
+		//log.debug "in AddUser - graphdb" + graphDb
 		
 		def userType = "user"
 		// validation
 		userIn.with {
 			if(!activationMethod.equals("facebook") && (!userName || !password)) {
-				println "userName and password are required fields for non-facebook enabled accounts."
+				log.debug "userName and password are required fields for non-facebook enabled accounts."
 				return null
 			}
 			if(userTypeCode) {
@@ -113,7 +114,7 @@ class UserService {
 				facebookUpdateTime = userIn.facebookUpdateTime == null ? "" : userIn.facebookUpdateTime
 				return it
 			}
-			println "just added this email... ${u.email}"
+			log.debug "just added this email... ${u.email}"
 			userIndex = graphDb.index().forNodes('users')
 			userIndex.add(u.underlyingNode, "userName", u.userName)
 			userIndex.add(u.underlyingNode, "id", u.userId)
@@ -126,13 +127,13 @@ class UserService {
 		return u
 	}
 	def updateUser(userIn, userId) {
-		println "in updateUser - userIn" + userIn.toString()
+		log.debug "in updateUser - userIn" + userIn.toString()
 		Transaction tx = graphDb.beginTx()
 		def u = null
 		try {
 			// make sure the id matches
 			if(!userIn.activationMethod.equals("facebook") && (Long.valueOf(userId) != userIn.userId)) {
-				println "Could not update.. userId did not match"
+				log.debug "Could not update.. userId did not match"
 				return null
 			}
 			
@@ -140,7 +141,7 @@ class UserService {
 			u = findUsersByProperty("id", Long.valueOf(userId))
 			if(!u)
 			{
-				println "Could not update.. user not found"
+				log.debug "Could not update.. user not found"
 				return false
 			}
 			
@@ -175,14 +176,14 @@ class UserService {
 	}
 	
 	def updateUserPhotoUrl(userId, photoUrl) {
-		println "in updateUserPhotoUrl - userId: ${userId}, photoUrl:${photoUrl}"
+		log.debug "in updateUserPhotoUrl - userId: ${userId}, photoUrl:${photoUrl}"
 		Transaction tx = graphDb.beginTx()
 		def u = null
 		try {
 			u = findUsersByProperty("id", userId)
 			if(!u)
 			{
-				println "Could not update.. user not found"
+				log.debug "Could not update.. user not found"
 				return false
 			}
 			
@@ -218,7 +219,7 @@ class UserService {
 	}
 	
 	def findNumberOfUsersByUserName(userName) {
-		println "in findNumberOfUsersByUserName(), looking for property [ $userName ]"
+		log.debug "in findNumberOfUsersByUserName(), looking for property [ $userName ]"
 			
 		userIndex = graphDb.index().forNodes('users')
 		IndexHits<Node> hits = userIndex.get('userName', userName)
@@ -228,7 +229,7 @@ class UserService {
 	}
 	
 	def findUsersByProperty(property, value) {
-		println "in findUsersByProperty(), looking for property [ $property ] with value [ $value ]"
+		log.debug "in findUsersByProperty(), looking for property [ $property ] with value [ $value ]"
 		
 		if(property.equals("id")) {
 			value = Long.valueOf(value)
@@ -244,7 +245,7 @@ class UserService {
 				hits.close()
 				if(userNode)
 				{
-					println "### user found in index ###"
+					log.debug "### user found in index ###"
 					def u = new User(userNode)
 					return u
 				}
@@ -272,7 +273,7 @@ class UserService {
 				def u = new User(node)
 				allUsers.push(u)
 				if(property.equals("id") || property.equals("userName") || property.equals("email")) {
-					println "!!! adding user with property:[$property] and value:[${value}] to index !!!"
+					log.debug "!!! adding user with property:[$property] and value:[${value}] to index !!!"
 					userIndex.add node, property, value		
 				}
 					
@@ -283,26 +284,26 @@ class UserService {
 			tx.finish()
 		}
 		
-		println "found ${allUsers.size()}"
+		log.debug "found ${allUsers.size()}"
 		if(!allUsers)
 			return null
 		return allUsers
 	}
 	
 	def deleteUser(userName) {
-		println "in deleteUser() with id [ $userName ] "
+		log.debug "in deleteUser() with id [ $userName ] "
 		Transaction tx = graphDb.beginTx()
 		try {
 			// get the user
 			def u = findUsersByProperty("userName", userName)
 			if(!u)
 			{
-				println "Could not delete.. user not found"
+				log.debug "Could not delete.. user not found"
 				return false
 			}
 			
 			// delete node
-			println "Deleting user from graph"
+			log.debug "Deleting user from graph"
 			u.underlyingNode.delete()
 			for(rel in u.underlyingNode.getRelationships())
 			{
@@ -310,7 +311,7 @@ class UserService {
 			}
 			
 			// delete node from index
-			println "Deleting user from index"
+			log.debug "Deleting user from index"
 			userIndex = graphDb.index().forNodes("users")
 			userIndex.remove(u.underlyingNode)
 			
@@ -354,7 +355,7 @@ class UserService {
 	}
 	
 	def signInFacebook(fbUserIn) {
-		println("in signInFacebook()")
+		log.debug("in signInFacebook()")
 		
 		
 		def userId
@@ -365,15 +366,15 @@ class UserService {
 		
 		// TODO: Only update the bookup user if facebook's updatetime has changed
 		fbUserIn.location = fbUserIn.location.name
-		println("looking for user with email address: " + fbUserIn.email)
+		log.debug("looking for user with email address: " + fbUserIn.email)
 		def u = findUsersByProperty("email", fbUserIn.email)
 		if(!u) {
-			println("adding user")
+			log.debug("adding user")
 			u = addUser(fbUserIn)
 			userId = u.userId
 		}
 		else {
-			println("updating user. ID is ${u.userId}")
+			log.debug("updating user. ID is ${u.userId}")
 		
 			boolean updateUser = false
 			if(!u.facebookUpdateTime) {
@@ -381,11 +382,11 @@ class UserService {
 			}
 			else {
 				DateTimeComparator dtc = DateTimeComparator.getInstance()
-				println "compare result - " + dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime)
+				log.debug "compare result - " + dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime)
 				
 				if(dtc.compare(fbUserIn.facebookUpdateTime,u.facebookUpdateTime) > 0) {
 					updateUser = true
-					println "facebook update time is greater than the last recorded time in the bookup database"
+					log.debug "facebook update time is greater than the last recorded time in the bookup database"
 				}
 			}
 			
@@ -451,7 +452,7 @@ class UserService {
 			tx.finish()
 		}
 
-		println "found ${followingUsers.size()}"
+		log.debug "found ${followingUsers.size()}"
 		return followingUsers
 	}
 	
@@ -464,7 +465,7 @@ class UserService {
 		def following = findFollowList(userNameFollowing, Direction.OUTGOING) 
 		for (User u3 in following) {
 			if(u3.userName.equals(userNameToFollow)) {
-				println "this user already follows the target user."
+				log.debug "this user already follows the target user."
 				return false
 			}
 		}
@@ -489,7 +490,7 @@ class UserService {
 			tx.finish()
 		}
 		return true
-		println "$userNameFollowing successfully followed ${userNameToFollow}"
+		log.debug "$userNameFollowing successfully followed ${userNameToFollow}"
 	}
 	
 	def unfollowUser(userNameFollowing, userNameToUnfollow) {
@@ -515,7 +516,7 @@ class UserService {
 			tx.finish()
 		}
 		
-		println "$userNameFollowing successfully unfollowed ${userNameToUnfollow}"
+		log.debug "$userNameFollowing successfully unfollowed ${userNameToUnfollow}"
 		return true
 	}
 	private Node getSubReferenceNode(relType) {
@@ -546,11 +547,11 @@ class UserService {
 	
 	def deleteAllUsers() {
 		def allUsers = findAllUsers()
-		println "number of users to be deleted ${allUsers.size()}"
+		log.debug "number of users to be deleted ${allUsers.size()}"
 		Transaction tx = graphDb.beginTx()
 		for(u in allUsers) {
 			// delete node
-			println "Deleting user from graph"
+			log.debug "Deleting user from graph"
 			u.underlyingNode.delete()
 			for(rel in u.underlyingNode.getRelationships())
 			{
@@ -558,7 +559,7 @@ class UserService {
 			}
 			
 			// delete node from index
-			println "Deleting user from index"
+			log.debug "Deleting user from index"
 			userIndex = graphDb.index().forNodes("users")
 			userIndex.remove(u.underlyingNode)
 		}
@@ -940,21 +941,21 @@ class UserService {
 	}
 	
 //	def deleteSubReferenceNodes(relType) {
-//		println "in deleteSubReferenceNodes()"
+//		log.debug "in deleteSubReferenceNodes()"
 //		def rels = graphDb.getReferenceNode().getRelationships(
 //			relType, Direction.OUTGOING );
 //
 //		def subReferenceNode = null;
-//		//println "number of relationships12: ${rels.size()}"
+//		//log.debug "number of relationships12: ${rels.size()}"
 //		
 //		//Integer numRels = rels.size()
-//		//println "numRels: ${numRels}"
+//		//log.debug "numRels: ${numRels}"
 //
-//			println "deleting relationships"
+//			log.debug "deleting relationships"
 //			Transaction tx = graphDb.beginTx()
 //			def i = 1
 //			for(rel in rels) {
-//				println "testing"
+//				log.debug "testing"
 //				def node = rel.getEndNode();
 //				def childrel = node.getSingleRelationship(RelTypes.USER, Direction.OUTGOING )
 //				if(childrel != null) {
@@ -964,7 +965,7 @@ class UserService {
 //				}
 //				node.delete()
 //				rel.delete()
-//				println "deleted ${i}"
+//				log.debug "deleted ${i}"
 //				i++;
 //			}
 //			tx.success()
@@ -1007,7 +1008,7 @@ class UserFactory {
 			return it
 		}
 		
-		println "userId: ${u.userId}"
+		log.debug "userId: ${u.userId}"
 		// add to index
 		userIndex.add(userNode, "id", u.userId)
 		return u
@@ -1041,18 +1042,18 @@ class UserFactory {
 	}
 	private synchronized Long getNextId()
 	{
-		println "in getNextId()"
+		log.debug "in getNextId()"
 		def counter = null;
 		try
 		{
 			counter = usersReferenceNode.getProperty( KEY_COUNTER );
-			println "counter: ${counter}"
+			log.debug "counter: ${counter}"
 		}
 		catch ( e )
 		{
 			// Create a new counter
 			counter = 0L;
-			println "counter2: ${counter}"
+			log.debug "counter2: ${counter}"
 		}
 		
 		usersReferenceNode.setProperty( KEY_COUNTER, new Long( counter + 1 ) );

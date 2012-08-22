@@ -19,12 +19,9 @@ class IndexController {
 		users = userService.findAllUsers()	
 		books = bookService.findAllBooks()
 		
-
 		for(Book b in books) {
-			println "bookId - ${b.bookId}"
 			checkIns.addAll(bookService.findCheckInsByBookId(b.bookId))
 			bookLists.addAll(listService.findListsByBookId(b.bookId, ""))
-			
 		}
 
 	}

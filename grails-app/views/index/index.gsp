@@ -67,7 +67,7 @@
     					}
   					},
         			data: {jsondata : $('#jsondata_addbook').val() }
-        		}).done(function(msg) { alert("data saved" + msg); })
+        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload(); })
         		.fail(function(jqXHR, textStatus) {
 				  alert( "Request failed: " + textStatus );
 				});;
@@ -79,7 +79,7 @@
         			url: url,
         			type: "POST",
         			data: {jsondata : $('#jsondata_adduser').val() }
-        		}).done(function(msg) { alert("data saved" + msg); });
+        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
         	}
         	
         	function updateBook() {
@@ -90,7 +90,7 @@
         			url: url,
         			type: 'POST',
         			data: {jsondata : $('#jsondata_updatebook').val() }
-        		}).done(function(msg) { alert("data saved" + msg); });
+        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
         	}
         	
         	function getBook() {
@@ -126,7 +126,7 @@
         			url: url,
         			type: 'POST',
         			data: {jsondata : $('#jsondata_updateuser').val() }
-        		}).done(function(msg) { alert("data saved" + msg); });
+        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
         	}
         	
         	function deleteUser() {
@@ -136,7 +136,7 @@
         		$.ajax({
         			url: url,
         			type: 'GET'
-        		}).done(function(msg) { alert("data saved" + msg); });
+        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
         	}
         	
         	function deleteBook() {
@@ -146,7 +146,7 @@
         		$.ajax({
         			url: url,
         			type: 'GET'
-        		}).done(function(msg) { alert("data saved" + msg); });
+        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
         	}
         	
         	function createCheckIn() {
@@ -160,7 +160,7 @@
         			url: url,
         			type: 'POST',
         			data: {jsondata : "{'userId':"+userId+",'narrative':'"+narrative+"','chapterOrSection':'"+chapterOrSection+"','venue':null,'latitude':null,'longitude':null}" }
-        		}).done(function(msg) { alert("data saved " + msg); });
+        		}).done(function(msg) { alert("data saved "); document.location.reload(); });
         	}
         	function addToList() {
 				var url = "api/list/";
@@ -174,7 +174,7 @@
         			url: url,
         			type: 'POST',
         			data: {jsondata : "{'bookId':"+bookId+",'listType':'" +listType+"','listTitle':'"+listTitle+"','creationType':'"+creationType+"'}"}
-        		}).done(function(msg) { alert("data saved" + msg); });
+        		}).done(function(msg) { alert("data saved - refreshing page"); document.location.reload(); });
         	}
         </g:javascript>
     </head>
@@ -596,9 +596,9 @@
                             
                             <td>${fieldValue(bean: bl, field: "type")}</td>
                         
-                            <td>${fieldValue(bean: bl, field: "bookId")}</td>
+                            <td>${fieldValue(bean: bl, field: "book.bookId")}</td>
                         
-                            <td>${fieldValue(bean: bl, field: "userId")}</td>
+                            <td>${fieldValue(bean: bl, field: "user.userId")}</td>
                         
                             <td>${fieldValue(bean: bl, field: "createDate")}</td>
                         

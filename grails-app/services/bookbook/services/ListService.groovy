@@ -138,15 +138,8 @@ class ListService {
 		}
 		println "found [${allLists.size()}] lists for book [${b.title}] as End Node"
 		
-		/*
-		def allLists2 = []
-		def rels2 = b.underlyingNode.getRelationships(RelTypes.valueOf(listType), Direction.INCOMING)
-		for (rel2 in rels2) {
-			BookList bl = new BookList(rel2)
-			allLists2.push(bl)
-		}
-		println "found [${allLists2.size()}] lists in graph for book with bookId [${b.bookId}] as Start Node"
-		*/
+		// rje: deleted some code that pulls from the actual graph - see git history
+		
 		return allLists
 	}
 	
@@ -160,17 +153,9 @@ class ListService {
 			allLists.add(bl)
 		}
 		println "found [${allLists.size()}] lists for user [${u.userName}] as End Node"
-		/* The index is working 
-		def allLists2 = []
-		def rels2 = u.underlyingNode.getRelationships(RelTypes.valueOf(listType), Direction.OUTGOING)
-		for (rel2 in rels2) {
-			BookList bl = new BookList(rel2)
-			allLists2.push(bl)
-		}
-		println "found [${allLists2.size()}] lists in graph for user with userId [${u.userId}] as Start Node"
 		
-		allLists.addAll(allLists2)
-		*/
+		// rje: deleted some code that pulls from the actual graph - see git history
+		
 		return allLists
 	}
 	

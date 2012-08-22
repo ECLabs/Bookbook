@@ -157,7 +157,7 @@ class BookService {
 							pos.currentNode().getProperty(property, null).toLowerCase().contains(value.toLowerCase())
 					}
 					return !pos.isStartNode() &&
-						pos.currentNode().getProperty(property, null).replaceFirst("^0+", "").equals(value)
+						pos.currentNode().getProperty(property, null).replaceFirst("^0+","").equals(value)
 				}
 			},
 			RelTypes.BOOK, Direction.OUTGOING

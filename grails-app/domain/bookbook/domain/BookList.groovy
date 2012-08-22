@@ -5,8 +5,8 @@ import org.neo4j.graphdb.Relationship;
 class BookList {
 
 	Long bookListId
-	Long bookId
-	Long userId
+//	Long bookId
+//	Long userId
 	String type
 	String title
 	String createDate
@@ -14,8 +14,6 @@ class BookList {
 	Relationship underlyingRel
 	Book book
 	User user
-	
-	Book[] books
 	
 	// Constructor
 	BookList(rel) {
@@ -27,11 +25,14 @@ class BookList {
     static constraints = {
     }
 	
-	static transients = ["underlyingRel", "user", "book","books"]
+	static embedded = ['book', 'user']
+	static transients = ["underlyingRel"]
 	
 	public Long getBookListId() { return underlyingRel.getProperty("id", null); }
-	public Long getUserId() { return user.getUserId(); }
-	public Long getBookId() { return book.getBookId(); }
+//	public Long getUserId() { return user.getUserId(); }
+//	public Long getBookId() { return book.getBookId(); }
+	public Book getBook() { return book; }
+	public User getUser() { return user; }
 	public String getType() { return underlyingRel.getProperty("type", null); }
 	public String getTitle() { return underlyingRel.getProperty("title", null); }
 	public String getCreateDate() { return underlyingRel.getProperty("createDate", null); }
@@ -40,5 +41,4 @@ class BookList {
 	public void setType(String type) { underlyingRel.setProperty("type", type); }
 	public void setTitle(String title) { underlyingRel.setProperty("title", title); }
 	public void setCreateDate(String createDate) { underlyingRel.setProperty("createDate", createDate); }
-	
 }

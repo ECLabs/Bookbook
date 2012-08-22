@@ -28,7 +28,7 @@ class UserController {
 	}
 	
 	def add = { 		
-		log.info "in add(). Incoming json data is --> " + params['jsondata']
+		log.info "in add(). Parameters are ${params.toString()}. Incoming json data is --> " + params['jsondata']
 
 		// we have to remove the return characters otherwise decodeBase64 won't work
 		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
@@ -60,7 +60,7 @@ class UserController {
 	 * /user/jgarland/follow?targetUserName=rjevans&follow-action=create
 	 */
 	def signIn = { 
-		log.info "in signIn(). username --> " + params.username + " password --> " + params.password
+		log.info "in signIn(). Parameters are ${params.toString()}"
 		def returnVal = userService.signIn(params.username, params.password)
 		if(returnVal instanceof User) {
 			render returnVal as JSON
@@ -71,7 +71,7 @@ class UserController {
 	}
 	
 	def signInFacebook = {
-		log.info "in signInFacebook(). jsondata -->" + params['jsondata']
+		log.info "in signInFacebook(). Parameters are ${params.toString()}. jsondata -->" + params['jsondata']
 		
 		// we have to remove the return characters otherwise decodeBase64 won't work
 		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
@@ -100,10 +100,12 @@ class UserController {
 	}
 	
 	def findByUserName = {
+		log.info "In findByUserName(). Parameters are ${params.toString()}"
 		render userService.findUsersByProperty("userName", params.userName) as JSON
 	}
 	
 	def findByUserId = {
+		log.info "In findByUserId(). Parameters are ${params.toString()}"
 		def returnVal = userService.findUsersByProperty("id", Long.valueOf(params.userId))
 		if(returnVal == null) {
 			render "[]"
@@ -115,6 +117,7 @@ class UserController {
 	}
 	
 	def update = { 
+		log.info "In update(). Parameters are ${params.toString()}"
 		// we have to remove the return characters otherwise decodeBase64 won't work
 		def jsonNoReturns = params['jsondata'].replaceAll("\r") { "" }
 		log.debug "updated json - " + jsonNoReturns
@@ -130,7 +133,7 @@ class UserController {
 	} 
 	
 	def updatePhoto = {
-		log.info "In updatePhoto()"
+		log.info "In updatePhoto(). Parameters are ${params.toString()}"
 		
 		def f = request.getFile("myFile");
 		if(!f.empty) {
@@ -152,14 +155,17 @@ class UserController {
 	}
 	
 	def remove = {
+		log.info "In remove(). Parameters are ${params.toString()}"
 		render userService.deleteUser(params.userName)
 	}
 	
 	def findFollowers = { 
+		log.info "In findFollowers(). Parameters are ${params.toString()}"
 		render userService.findFollowList(params.userName, Direction.INCOMING) as JSON
 	}
 	
 	def findFollowing = { 
+		log.info "In findFollowing(). Parameters are ${params.toString()}"
 		render userService.findFollowList(params.userName, Direction.OUTGOING) as JSON
 	}
 	
@@ -170,6 +176,7 @@ class UserController {
 	 */
 	
 	def follow = { 
+		log.info "In follow(). Parameters are ${params.toString()}"
 		if(params.targetUserName && params['follow-action'].equals("create")) {
 			render userService.followUser(params.userName, params.targetUserName)
 		}
@@ -179,24 +186,28 @@ class UserController {
 	}
 	
 	def terminateFollow = { 
+		log.info "In terminateFollow(). Parameters are ${params.toString()}"
 		userService.unfollowUser(params.userName, params.targetUserName)
 	}
 	
 	def establishCheckIn = {
+		log.info "In establishCheckIn(). Parameters are ${params.toString()}"
 		def jsonCheckIn = params.jsondata
-		log.info "establishing checkin for username ${params.userName}"
 		render bookService.createCheckIn(jsonCheckIn, jsonCheckIn.bookId, params.userName)
 	}
 	
 	def findCheckInsByUserId = {
+		log.info "In findCheckInsByUserId(). Parameters are ${params.toString()}"
 		render bookService.findCheckInsByUserName(params.userName) as JSON
 	}
 	
 	def createTestUsers = {
+		log.info "In createTestUsers(). Parameters are ${params.toString()}"
 		userService.createTestUsers()
 	}
 	
 	def deleteAllUsers = {
+		log.info "In deleteAllUsers(). Parameters are ${params.toString()}"
 		userService.deleteAllUsers()
 	}
 	
@@ -205,6 +216,7 @@ class UserController {
 	}
 	
 	def validateAddUser(user) {
+		log.info "In validateAddUser(). Parameters are ${params.toString()}"
 		def userCount = userService.findNumberOfUsersByUserName(user.userName)
 		log.debug "Number of users with username $user.userName: $userCount"
 		if(userCount > 0) {
@@ -213,7 +225,7 @@ class UserController {
 		return true;
 	}
 	
-	def updatePhoto(userId, b) {
+	def updatePhoto(userId, b) { 
 		// Write to a file
 		def filename = userId + ".profilephoto.${new Date().getTime()}.png";
 		def fos= new FileOutputStream(basePhotoPath + filename)

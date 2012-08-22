@@ -13,8 +13,11 @@ import org.neo4j.graphdb.ReturnableEvaluator;
 import org.neo4j.graphdb.Transaction
 import org.neo4j.graphdb.Direction
 import org.neo4j.graphdb.TraversalPosition;
+import org.apache.commons.logging.LogFactory
 
 class ListService {
+	
+	private static final log = LogFactory.getLog(this)
 
     static transactional = false
 
@@ -30,7 +33,7 @@ class ListService {
 	
 	@PostConstruct
 	def initialize() {
-		println "############### initialize() in ListService - Loading graphDb, shutdownHook."
+		log.debug "############### initialize() in ListService - Loading graphDb, shutdownHook."
 		//graphDb = new EmbeddedGraphDatabase( DB_PATH );
 		//registerShutdownHook();
 		listIndex = graphDb.index().forNodes("lists")
@@ -40,7 +43,7 @@ class ListService {
 	
 	@PreDestroy
 	def cleanUp() {
-		println "############### cleanUp()  - Shutting down graphDb."
+		log.debug "############### cleanUp()  - Shutting down graphDb."
 		//graphDb.shutdown();
 	}
 	
@@ -101,11 +104,11 @@ class ListService {
 				bookListId = getNextId() 
 				return it
 			}
-			println "booklistobject:" + bl
+			log.debug "booklistobject:" + bl
 			
 			// add to index
 			def listIndex = graphDb.index().forRelationships("lists")
-			println "bookListId - ${bl.bookListId}"
+			log.debug "bookListId - ${bl.bookListId}"
 			
 			listIndex.add(bl.underlyingRel, "id", bl.bookListId)
 			listIndex.add(bl.underlyingRel, "bookId", b.bookId)
@@ -114,8 +117,8 @@ class ListService {
 			tx.success()
 		}
 		catch(Exception e) {
-			println e.toString()
-			println e.printStackTrace()
+			log.debug e.toString()
+			log.debug e.printStackTrace()
 			tx.failure()
 			
 			return false
@@ -123,7 +126,7 @@ class ListService {
 		finally {
 			tx.finish()
 		}
-		println "list creation successful."
+		log.debug "list creation successful."
 		return bl
 	}
 	
@@ -136,7 +139,7 @@ class ListService {
 			BookList bl = new BookList(rel)
 			allLists.push(bl)
 		}
-		println "found [${allLists.size()}] lists for book [${b.title}] as End Node"
+		log.debug "found [${allLists.size()}] lists for book [${b.title}] as End Node"
 		
 		// rje: deleted some code that pulls from the actual graph - see git history
 		
@@ -152,7 +155,7 @@ class ListService {
 			BookList bl = new BookList(rel)
 			allLists.add(bl)
 		}
-		println "found [${allLists.size()}] lists for user [${u.userName}] as End Node"
+		log.debug "found [${allLists.size()}] lists for user [${u.userName}] as End Node"
 		
 		// rje: deleted some code that pulls from the actual graph - see git history
 		
@@ -225,18 +228,18 @@ class ListService {
 	
 	private synchronized Long getNextId(keyCounter)
 	{
-		println "in getNextId()"
+		log.debug "in getNextId()"
 		def counter = null;
 		try
 		{
 			counter = referenceNode.getProperty( keyCounter );
-			println "counter: ${counter}"
+			log.debug "counter: ${counter}"
 		}
 		catch ( e )
 		{
 			// Create a new counter
 			counter = 0L;
-			println "counter2: ${counter}"
+			log.debug "counter2: ${counter}"
 		}
 		
 		referenceNode.setProperty( keyCounter, new Long( counter + 1 ) );

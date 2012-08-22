@@ -18,7 +18,7 @@ class BookController {
 	}
 	
 	def findById = {
-		log.info "in findById()"
+		log.info "in findById(). Parameters are ${params.toString()}"
 		def results = ""
 
 		if(params.id)
@@ -29,7 +29,7 @@ class BookController {
 	}
 	
 	def find = {
-		log.info "in find()"
+		log.info "in find(). Parameters are ${params.toString()}"
 		/**
 		 * Check to see if this is a query
 		 */
@@ -54,7 +54,7 @@ class BookController {
 	}
 	
 	def add = {
-		log.info "in add(). Json Data is --> " + params['jsondata']
+		log.info "in add(). . Parameters are ${params.toString()}. Json Data is --> " + params['jsondata'] + ". Parameters are ${params.toString()}"
 
 		def jsonBook = JSON.parse(params['jsondata'])
 		def newGoogleBook = new GoogleBook(jsonBook)
@@ -79,7 +79,7 @@ class BookController {
 	}
 	
 	def remove = {
-		log.info "in BookController.remove(). id is --> " + params.id
+		log.info "in BookController.remove(). Parameters are ${params.toString()}"
 		
 		bookService.deleteBook(params.id)
 		render "book deleted successfully!"

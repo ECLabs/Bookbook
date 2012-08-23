@@ -321,12 +321,10 @@
                     <thead>
                         <tr>
                         
-                            <g:sortableColumn property="bookId" title="${message(code: 'book.bookId.label', default: 'BookId')}" />
+                        	<g:sortableColumn property="title" title="${message(code: 'book.title.label', default: 'Title')}" />
                         
-                            <g:sortableColumn property="author" title="${message(code: 'book.author.label', default: 'Author')}" />
-                        
-                            <g:sortableColumn property="title" title="${message(code: 'book.title.label', default: 'Title')}" />
-                        
+                           	<g:sortableColumn property="author" title="${message(code: 'book.author.label', default: 'Author')}" />
+                            
                             <g:sortableColumn property="description" title="${message(code: 'book.description.label', default: 'Description')}" />
                         
                         	<g:sortableColumn property="isbn10" title="${message(code: 'book.isbn10.label', default: 'ISBN10')}" />
@@ -339,17 +337,15 @@
                     <g:each in="${books}" status="i" var="bookInstance">
                         <tr class="${(i % 2) == 0 ? 'odd' : 'even'}">
                         
-                            <td><g:link action="showbook" id="${bookInstance.bookId}">${fieldValue(bean: bookInstance, field: "bookId")}</g:link></td>
+                        	<td width="250"><a href="api/book/${bookInstance.bookId}">${fieldValue(bean: bookInstance, field: "title")} (${bookInstance.bookId})</a></td>
+                        	
+                            <td width="125">${fieldValue(bean: bookInstance, field: "author")}</td>
                         
-                            <td>${fieldValue(bean: bookInstance, field: "author")}</td>
-                        
-                            <td>${fieldValue(bean: bookInstance, field: "title")}</td>
-                        
-                            <td>${fieldValue(bean: bookInstance, field: "description")}</td>
+                            <td><g:truncate maxlength="60">${fieldValue(bean: bookInstance, field: "description")}</g:truncate></td>
                         
                             <td>${fieldValue(bean: bookInstance, field: "isbn10")}</td>
                         
-                            <td>${fieldValue(bean: bookInstance, field: "createDate")}</td>
+                            <td width="100">${fieldValue(bean: bookInstance, field: "createDate")}</td>
                         
                         </tr>
                     </g:each>

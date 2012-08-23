@@ -1,6 +1,7 @@
 package bookbook.domain
 
 import org.neo4j.graphdb.Node
+import org.ocpsoft.pretty.time.PrettyTime
 
 /**
  * Instantiate with...
@@ -51,7 +52,10 @@ class Book {
 	public String getIsbn10() { underlyingNode.getProperty("isbn10", null) }
 	public String getSmallThumbnailUrl() { underlyingNode.getProperty("smallThumbnailUrl", null) }
 	public String getThumbnailUrl() { underlyingNode.getProperty("thumbnailUrl", null) }
-	public String getCreateDate() { underlyingNode.getProperty("createDate", null) }
+	public String getCreateDate() { 
+		PrettyTime p = new PrettyTime();
+		return p.format(new Date(underlyingNode.getProperty("createDate", null)))
+	}
 	public Long getBookId() { return underlyingNode.getProperty("id", null) == null ? 1234 : underlyingNode.getProperty("id", null) }
 	
 	public void setTitle(String value) {

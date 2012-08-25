@@ -13,6 +13,10 @@ class BookController {
 	def GOOGLE_BOOKS_MAX_RESULTS_PER_SEARCH = 10
 	def bookService
 	
+	def books = {
+		books = bookService.findAllBooks()
+	}
+	
     def index = { 
 		render "I'm alive!  The current time is " + new Date()
 	}

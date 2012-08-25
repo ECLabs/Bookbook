@@ -136,6 +136,10 @@ class UrlMappings {
 		{
 			controller = "index"	
 		}
+		"/books"
+		{
+			controller = "book"
+		}
 		"500"(view:'/error')
 		
 		

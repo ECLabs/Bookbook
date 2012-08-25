@@ -231,7 +231,7 @@ class BookService {
 		Transaction tx = graphDb.beginTx()
 		try {			
 			// strip any leading 0's on the ISBN appropriately before saving and comparing
-			b.isbn10 = b.isbn10.replaceFirst("^0+", "")
+			b.isbn10 = b.isbn10?.replaceFirst("^0+", "")
 			
 			def bookId = b.bookId
 			// make sure the id matches

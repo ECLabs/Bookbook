@@ -160,8 +160,8 @@ class BookService {
 						return !pos.isStartNode() &&
 							pos.currentNode().getProperty(property, null).toLowerCase().contains(value.toLowerCase())
 					}
-					return !pos.isStartNode() &&
-						pos.currentNode().getProperty(property, null).replaceFirst("^0+","").equals(value)
+					def currentValue = pos.currentNode().getProperty(property, null) == null ? "" : pos.currentNode().getProperty(property, null)
+					return !pos.isStartNode() && currentValue.equals(value)
 				}
 			},
 			RelTypes.BOOK, Direction.OUTGOING
@@ -396,10 +396,12 @@ class BookService {
 	}
 	
 	def findCheckInsByBookId(bookId) {
+		def allCheckIns = []
 		def checkInIndex = graphDb.index().forRelationships("checkIns")
 		def b = findBooksByProperty("id", bookId)
+		if(b instanceof ArrayList) return allCheckIns // TODO: clean this up
 		def rels = checkInIndex.query(null, null, b.underlyingNode)
-		def allCheckIns = []
+		
 		for(rel in rels) {
 			CheckIn ci = new CheckIn(rel)
 			allCheckIns.push(ci)

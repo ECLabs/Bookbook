@@ -69,13 +69,16 @@ environments {
 log4j = {
     // Example of changing the log pattern for the default console
     // appender:
-   
+	def customLayout = new CustomHtmlLayout()
+
 	appenders {
-		rollingFile  name:'errorLog', file:'error.log', threshold: org.apache.log4j.Level.ERROR, maxFileSize:1024
+		rollingFile  name:'errorLog', pattern: pattern(conversionPattern: "%c{2} %m%n"), file:'bookup.error.log', threshold: org.apache.log4j.Level.ERROR, maxFileSize:102400, maxBackupIndex:5
+		rollingFile  name:'errorLogHtml', layout: customLayout, file:'bookup.errorlog.html', threshold: org.apache.log4j.Level.ERROR, maximumFileSize:102400, maxBackupIndex:5
 	}
 	
 	root {
 		info 'stdout','file'
+		error 'errorLog','errorLogHtml'
 		additivity = true
 	}
 

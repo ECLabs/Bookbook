@@ -199,8 +199,8 @@ body {
    		}).done(function(msg) { 
    			var resp = JSON.stringify(msg, undefined, 2); 
    			$('#popupTitle').text(title);
-   			$('#jsonCode').html(resp);
-   			$('#myModal').modal(); 
+   			$('#jsonCode').val(resp);
+   			$('#myModal').modal('show'); 
    			$('#popupBookId').val(bookId);
    		}).fail(function(jqXHR, textStatus) {
 	  		alert( "Request failed: " + textStatus );

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Bootstrap, from Twitter</title>
+<title>BookUP - Books Console</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="description" content="">
 <meta name="author" content="">
@@ -372,6 +372,7 @@ body {
    			$('#the-alert').removeClass('alert-error').addClass('alert-success');
    			g_refreshPage = true;
    			$('#myModal2').modal('hide'); // hide the window after a delete 
+   			document.location.reload();
    		}).fail(function(jqXHR, textStatus) {
 		 	var msg = "BookUp is having problems... see the application log for more details.";
 			$('#the-alert span').html(msg);

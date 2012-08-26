@@ -12,9 +12,24 @@ class BookController {
 
 	def GOOGLE_BOOKS_MAX_RESULTS_PER_SEARCH = 10
 	def bookService
+	def queryReturn
+	def youSearchedFor
+	def jsonBookArray = []
 	
 	def books = {
-		books = bookService.findAllBooks()
+		log.info "in books(). Parameters are ${params.toString()}"
+		youSearchedFor = "12 Results for query \"${params.title}\""
+		queryReturn = params.title
+		if(params.title) {
+			books = findAllSources2(params)
+			for(b in books) {
+				jsonBookArray.push(b as JSON)
+			}
+		}
+		else {
+			books = bookService.findAllBooks()
+		}
+		
 	}
 	
     def index = { 
@@ -28,6 +43,9 @@ class BookController {
 		if(params.id)
 			results = bookService.findBooksByProperty("id", params.id)
 		
+		if(results instanceof ArrayList) {
+			results = results[0]
+		}
 		render results as JSON
 		
 	}
@@ -156,6 +174,50 @@ class BookController {
 		}
 		
 		render combined.values() as JSON
+	}
+	
+	def findAllSources2(parameters) {
+		log.info "in findAllSources(). Parameters are ${params.toString()}"
+		
+		def externals = []
+		def internals = []
+		def combined = [:]
+		
+		if(parameters.isbn10) {
+			externals = bookService.findGoogleBooks("isbn", parameters.isbn10, 0, 10)
+			internals = bookService.findBooksByProperty("isbn10", parameters.isbn10)
+		}
+		else if(parameters.title) {
+			externals = bookService.findGoogleBooksByTitle(parameters.title, parameters.page)
+			internals = bookService.findBooksByProperty("title", parameters.title)
+		}
+		else if(parameters.author) {
+			externals = bookService.findGoogleBooksByAuthor(parameters.author, parameters.page)
+			internals = bookService.findBooksByProperty("author", parameters.author)
+		}
+		else {
+			return []; // invalid query
+		}
+		
+		// combine into one list
+		externals.addAll(internals)
+		
+		// add the books into a Map so we can eliminate duplicates - preferences for books with BookUp IDs
+		for(Book book in externals) {
+			def isbn = book.isbn10.replaceFirst("^0+", "") // strip leading zeros from ISBN first - comes from Google with a leading zero
+			//book.isbn10 = book.isbn10.replaceFirst("^0+", "")
+			if(combined[(isbn)]) { // if the book is already in the map, see if we need to replace it
+				if(book.getBookId() != null) { // replace with this one, prefer the one with an ID
+					combined[(isbn)] = book
+				}
+			}
+			else {
+				combined.put(isbn, book)
+			}
+			
+		}
+		
+		return combined.values();
 	}
 }
 

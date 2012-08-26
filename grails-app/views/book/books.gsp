@@ -29,7 +29,7 @@ body {
 <body>
 <div class="navbar navbar-fixed-top">
   <div class="navbar-inner">
-    <div class="container-fluid"> <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a> <a class="brand" href="#">BookUP</a>
+    <div class="container-fluid"> <a class="btn btn-navbar" data-toggle="collapse" data-target=".nav-collapse"> <span class="icon-bar"></span> <span class="icon-bar"></span> <span class="icon-bar"></span> </a> <a class="brand" href="/Bookbook/index/dashboard">BookUP</a>
       <div class="btn-group pull-right"> <a class="btn dropdown-toggle" data-toggle="dropdown" href="#"> <i class="icon-user"></i> Username <span class="caret"></span> </a>
         <ul class="dropdown-menu">
           <li><a href="#">Profile</a></li>
@@ -39,8 +39,8 @@ body {
       </div>
       <div class="nav-collapse">
         <ul class="nav">
-          <li class="active"><a href="dashboard.html">Console</a></li>
-          <li><a href="apidocs.html">API Documentation</a></li>
+          <li class="active"><a href="/Bookbook/index/dashboard">Console</a></li>
+          <li><a href="#">API Documentation</a></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
@@ -57,35 +57,41 @@ body {
   </div>
   <div class="row-fluid">
     <ul class="nav nav-tabs">
-      <li><a href="dashboard.html">Dashboard</a></li>
-      <li class="active"><a href="#">All Books</a></li>
-      <li><a href="#">Book Lists</a></li>
+      <li><a href="/Bookbook/index/dashboard">Dashboard</a></li>
+      <li class="active"><a href="/Bookbook/book/books">Books</a></li>
+<!--      <li><a href="#">Book Lists</a></li>
       <li><a href="#">Users</a></li>
       <li><a href="#">Check-Ins</a></li>
       <li><a href="#">Followers</a></li>
-      <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" href="#">Dropdown <b class="caret"></b> </a>
+      <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" href="#">Actions <b class="caret"></b> </a>
         <ul class="dropdown-menu">
-          <!-- links -->
+          
         </ul>
-      </li>
+      </li> -->
     </ul>
   </div>
   <div class="row-fluid">
-    <h1 class="pull-left">All Books</h1>
+    <h1 class="pull-left">Books</h1>
+    <div class="alert pull-left hide" id="the-alert" style="margin-left:10px;">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <span></span>
+      </div>
 
     
     <div class="btn-toolbar" style="padding-bottom:30px; margin-top:0;">
       <!-- <div class="btn-group pull-right"> <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#"> Re-index </a> </div> -->
-      <div class="btn-group  pull-right" style="margin-right:5px;"> <a class="btn btn-success" href="#" onclick="launchAddBookModal()"> Add a Book</a>
+      <div class="btn-group  pull-right" style="margin-right:5px;"> <a class="btn" href="#" onclick="launchAddBookModal()"> Create a Book</a>
       </div>
-      <!-- 
-      <div class="pull-right"> 
+       
+      <g:form action="books" controller="book" method="get" style="clear:none;margin:0;padding:0;">
+      <div class="pull-right" style="margin-right:10px"> 
       	<span class="input-append">
-        	<input class="span2" id="appendedInputButton" size="16" type="text" style="width:200px"><button class="btn" type="button"><i class="icon-search"></i> BookUP</button><button class="btn" type="button">Reset</button>
+        	<input class="span2" name="title" id="appendedInputButton" size="16" type="text" style="width:200px" value="${queryReturn}"><button class="btn" type="submit"><i class="icon-search"></i> Search</button><button class="btn" type="button" onclick="window.location='/Bookbook/book/books'">Reset</button>
         </span> 
       </div>
-       -->
-       <span class="label pull-left" style="margin-top:14px;margin-left:15px;">Showing all ${books.size} books</span>
+      </g:form>
+      
+       <!-- <span class="label pull-left" style="margin-top:14px;margin-left:15px;">Showing all ### books</span> -->
     </div>
     
     <br/>
@@ -93,21 +99,54 @@ body {
   <div class="row-fluid">
     <table class="table table-striped">
       <tr>
+      	<th>ID</th>
         <th>Title</th>
         <th>Author</th>
         <th>Description</th>
         <th>Thumb</th>
         <th>ISBN</th>
-        <th>Create Date</th>
+        <th>Created</th>
+        <th>Actions</th>
       </tr>
       <g:each in="${books}" status="i" var="bookInstance">
-          <tr>     
-          	  <td><i class="icon-book"></i> <a href="/Bookbook/api/book/${bookInstance.bookId}" id="book-${bookInstance.bookId}" onclick="showEditWindow(this); return false;">${fieldValue(bean: bookInstance, field: "title")}</a> <span class="label label-important">${bookInstance.bookId}</span></td>          	
+          <tr>  
+          	  <td> 
+          	  		<g:if test="${bookInstance.bookId == null}">
+          	  			<span class="label label-success">G</span>
+          	  		</g:if>
+              		<g:else>
+              			<span class="label label-important">${bookInstance.bookId}</span>
+              		</g:else>
+          	  </td>   
+          	  <td class="firstRow">
+          	  		<!-- <i class="icon-book"></i>  --> 
+          	  		<a href="/Bookbook/api/book/${bookInstance.bookId}" id="book-${bookInstance.bookId}" onclick="showEditWindow(this); return false;">
+          	  		${fieldValue(bean: bookInstance, field: "title")}
+          	  		</a> 
+          	  		
+          	  </td>          	
               <td>${fieldValue(bean: bookInstance, field: "author")}</td>
-              <td width="300">${fieldValue(bean: bookInstance, field: "description")}</td>
+              <td width="300"><g:truncate maxlength="200">${fieldValue(bean: bookInstance, field: "description")}</g:truncate></td>
               <td><img src="${bookInstance.smallThumbnailUrl}"/></td>
               <td>${fieldValue(bean: bookInstance, field: "isbn10")}</td>
-              <td>${fieldValue(bean: bookInstance, field: "createDate")}</td>
+              
+              <td width="100">
+              	<g:if test="${bookInstance.bookId == null}">
+              		&nbsp;
+              	</g:if>
+              	<g:else>
+              		${fieldValue(bean: bookInstance, field: "createDate")}
+              	</g:else>
+              </td>    
+              <td width="100">
+              	<g:if test="${bookInstance.bookId == null}">
+              		<a id="jamil" class="btn btn-success" style="width:78px" href="#" onclick="addGoogleBook(this)">Add Book</a>
+              		<span class="jsonForAdd" style="display:none">${jsonBookArray[i]}</span>
+              	</g:if>
+              	<g:else>
+              		<a id="jamil" class="btn btn-info" style="width:78px" href="#" onclick="showEditWindow($('#book-${bookInstance.bookId}'));">Update Book</a>
+              	</g:else>
+              </td>
           </tr>
       </g:each>
     </table>
@@ -158,6 +197,11 @@ body {
     <a href="#" class="btn btn-primary" id="saveBtn2" onclick="$('#spinner2').show(); addBook($('#jsonCode2').val())">Save</a> </div>
   </div>
   
+
+  <div  style="text-align:center">
+  	<span class="label">Displaying ${books.size()} results</span>
+	</div>
+	
 
   <hr>
   <footer>
@@ -298,7 +342,45 @@ body {
 		$('#jsonCode2').val(JSON.stringify(eval(json), undefined, 2));
 	}	
 	
-			
+	function addGoogleBook(addBtn) {
+		var jsonSpan = $(addBtn).next('span');
+		var json = $(jsonSpan).text();
+		
+		var url = "/Bookbook/api/book";
+    	$.ajax({
+    			url: url,
+    			type: "POST",
+    			statusCode: {
+					409: function() {
+  						var msg = "Attempt to add a duplicate book - another with the same ISBN already exists.";
+  						$('#the-alert span').html(msg);
+   						$('#the-alert').removeClass('alert-success').addClass('alert-error');
+   						// $('#spinner2').hide();
+						$('#the-alert').show().delay(3000).fadeOut('slow');
+					},
+					500: function() {
+  						var msg = "BookUp is having problems... see the application log for more details.";
+  						$('#the-alert span').html(msg);
+   						$('#the-alert').removeClass('alert-success').addClass('alert-error');
+   						//$('#spinner2').hide();
+						$('#the-alert').show().delay(3000).fadeOut('slow');
+					}
+				},
+    			data: {jsondata : json }
+    	}).done(function(msg) { 
+    		$('#the-alert span').html('Book added successfully.   Refresh the page to see the results.');
+   			$('#the-alert').removeClass('alert-error').addClass('alert-success');
+   			g_refreshPage = true;
+   			$('#myModal2').modal('hide'); // hide the window after a delete 
+   		}).fail(function(jqXHR, textStatus) {
+		 	var msg = "BookUp is having problems... see the application log for more details.";
+			$('#the-alert span').html(msg);
+			$('#the-alert').removeClass('alert-success').addClass('alert-error');
+		}).always(function() {
+			//$('#spinner').hide();
+			$('#the-alert').show().delay(3000).fadeOut('slow');
+		});
+	}		
 
 	</g:javascript>
 </body>

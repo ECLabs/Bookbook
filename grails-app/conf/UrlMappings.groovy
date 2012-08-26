@@ -135,6 +135,7 @@ class UrlMappings {
 		"/" 
 		{
 			controller = "index"	
+			action = "dashboard"
 		}
 		"/books"
 		{

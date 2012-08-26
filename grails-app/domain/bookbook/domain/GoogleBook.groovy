@@ -1,5 +1,8 @@
 package bookbook.domain
 
+import grails.converters.JSON
+import org.codehaus.groovy.grails.web.json.JSONObject
+
 class GoogleBook {
 
 	Long bookId

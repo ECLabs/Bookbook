@@ -26,6 +26,10 @@ class IndexController {
 
 	}
 	
+	def dashboard = {
+
+	}
+	
 	def showuser = {
 		redirect(controller:"user", action: "findByUserId", params: [userId: params.id])
 	}

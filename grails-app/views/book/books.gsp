@@ -338,7 +338,7 @@ body {
 	function launchAddBookModal() {
 		$('#myModal2').modal('show');
 		$('#popupTitle2').text('Add a book');
-		var json = '({"author":"","description":"","isbn10":"","pubType":"","smallThumbnailUrl":"","source":"","thumbnailUrl":"","title":""})';
+		var json = '({"author":"","description":"","isbn10":"","pubType":"","smallThumbnailUrl":"","source":"","thumbnailUrl":"","title":"","creatorUserId":""})';
 		$('#jsonCode2').val(JSON.stringify(eval(json), undefined, 2));
 	}	
 	

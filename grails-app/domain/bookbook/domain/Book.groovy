@@ -29,6 +29,7 @@ class Book {
 	String smallThumbnailUrl
 	String thumbnailUrl
 	String createDate
+	Long creatorUserId
 	String source // google books, amazon, etc 
 	String pubType // book, magazine, paper, short-form
 	String bbRating // TODO
@@ -37,8 +38,7 @@ class Book {
 	Long haveReadCount // TODO
 	Long wantToReadCount // TODO
 	Long opinionCount // TODO
-	String createdBy // TODO
-	String creatorUserId // TODO
+	
 	CheckIn[] recentCheckIns // TODO
 	CheckIn[] friendsLastCheckIns // TODO
 	Opinion[] opinions // TODO
@@ -52,16 +52,17 @@ class Book {
 	public String getIsbn10() { underlyingNode.getProperty("isbn10", null) }
 	public String getSmallThumbnailUrl() { underlyingNode.getProperty("smallThumbnailUrl", null) }
 	public String getThumbnailUrl() { underlyingNode.getProperty("thumbnailUrl", null) }
+	public Long getCreatorUserId() { underlyingNode.getProperty("creatorUserId", null) }
+	public Long getBookId() { return underlyingNode.getProperty("id", null) == null ? 1234 : underlyingNode.getProperty("id", null) }
+	public String getPubType() { return underlyingNode.getProperty("pubType", null) }
 	public String getCreateDate() { 
 		PrettyTime p = new PrettyTime();
 		return p.format(new Date(underlyingNode.getProperty("createDate", null)))
 	}
-	public Long getBookId() { return underlyingNode.getProperty("id", null) == null ? 1234 : underlyingNode.getProperty("id", null) }
 	
 	public void setTitle(String value) {
 		underlyingNode.setProperty("title", value)	
-	}
-	
+	}	
 	public void setAuthor(String value) {
 		underlyingNode.setProperty("author", value)
 	}
@@ -77,8 +78,14 @@ class Book {
 	public void setThumbnailUrl(String value) {
 		underlyingNode.setProperty("thumbnailUrl", value)
 	}
+	public void setPubType(String value) {
+		underlyingNode.setProperty("pubType", value)
+	}
 	public void setCreateDate(String value) {
 		underlyingNode.setProperty("createDate", value)
+	}
+	public void setCreatorUserId(Long value) {
+		underlyingNode.setProperty("creatorUserId", value)
 	}
 	public void setBookId(Long value) {
 		underlyingNode.setProperty("id", value)

@@ -196,7 +196,7 @@ class BookService {
 		Transaction tx = graphDb.beginTx()
 		try {
 			// strip any leading 0's on the ISBN appropriately before saving and comparing
-			b.isbn10 = b.isbn10.replaceFirst("^0+", "")
+			b.isbn10 = b.isbn10?.replaceFirst("^0+", "")
 			
 			// check to see if the book was already added
 			def matches = findBooksByProperty("isbn10", b.isbn10).size()
@@ -214,7 +214,9 @@ class BookService {
 				isbn10 = b.isbn10
 				smallThumbnailUrl = b.smallThumbnailUrl
 				thumbnailUrl = b.thumbnailUrl
+				pubType = b.pubType
 				createDate = new Date().toString()
+				creatorUserId = b.creatorUserId
 				return it
 			}
 			tx.success()
@@ -255,6 +257,7 @@ class BookService {
 				isbn10 = b.isbn10
 				smallThumbnailUrl = b.smallThumbnailUrl
 				thumbnailUrl = b.thumbnailUrl
+				pubType = b.pubType
 				// don't update createDate nor bookId
 				return it
 			}			

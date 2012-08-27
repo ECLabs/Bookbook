@@ -6,6 +6,7 @@ import org.codehaus.groovy.grails.web.json.JSONObject
 class GoogleBook {
 
 	Long bookId
+	Long creatorUserId
 	String title
 	String author
 	String description
@@ -13,6 +14,7 @@ class GoogleBook {
 	String smallThumbnailUrl
 	String thumbnailUrl
 	String createDate
+	String pubType
 	
     static constraints = {
     }

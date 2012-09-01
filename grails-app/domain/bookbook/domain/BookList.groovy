@@ -37,8 +37,8 @@ class BookList {
 	public String getTitle() { return underlyingRel.getProperty("title", null); }
 	public String getCreateDate() { return underlyingRel.getProperty("createDate", null); }
 	
-	public void setBookListId(Long bookListId) { underlyingRel.setProperty("id", bookListId); }
-	public void setType(String type) { underlyingRel.setProperty("type", type); }
-	public void setTitle(String title) { underlyingRel.setProperty("title", title); }
-	public void setCreateDate(String createDate) { underlyingRel.setProperty("createDate", createDate); }
+	public void setBookListId(Long bookListId) { if(value) underlyingRel.setProperty("id", bookListId); }
+	public void setType(String type) { if(value) underlyingRel.setProperty("type", type); }
+	public void setTitle(String title) { if(value) underlyingRel.setProperty("title", title); }
+	public void setCreateDate(String createDate) { if(value) underlyingRel.setProperty("createDate", createDate); }
 }

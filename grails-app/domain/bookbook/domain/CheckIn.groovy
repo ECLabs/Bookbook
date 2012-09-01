@@ -52,14 +52,14 @@ class CheckIn {
 	public Book getBook() { return book }
 	public User getUser() { return user }
 	
-	public void setCheckInId(Long checkInId) { underlyingRel.setProperty("id", checkInId) }
-	public void setCheckInDate(String checkInDate) { underlyingRel.setProperty("checkInDate", checkInDate) }
-	public void setCreateDate(String createDate) { underlyingRel.setProperty("createDate", createDate) }
-	public void setNarrative(String narrative) { underlyingRel.setProperty("narrative", narrative) }
-	public void setVenue(String venue) { underlyingRel.setProperty("venue", venue) }
-	public void setChapterOrSection(String chapterOrSection) { underlyingRel.setProperty("chapterOrSection", chapterOrSection) }
-	public void setLatitude(String latitude) { underlyingRel.setProperty("latitude", latitude) }
-	public void setLongitude(String longitude) { underlyingRel.setProperty("longitude", longitude) }
+	public void setCheckInId(Long checkInId) { if(value) underlyingRel.setProperty("id", checkInId) }
+	public void setCheckInDate(String checkInDate) { if(value) underlyingRel.setProperty("checkInDate", checkInDate) }
+	public void setCreateDate(String createDate) { if(value) underlyingRel.setProperty("createDate", createDate) }
+	public void setNarrative(String narrative) { if(value) underlyingRel.setProperty("narrative", narrative) }
+	public void setVenue(String venue) { if(value) underlyingRel.setProperty("venue", venue) }
+	public void setChapterOrSection(String chapterOrSection) { if(value) underlyingRel.setProperty("chapterOrSection", chapterOrSection) }
+	public void setLatitude(String latitude) { if(value) underlyingRel.setProperty("latitude", latitude) }
+	public void setLongitude(String longitude) { if(value) underlyingRel.setProperty("longitude", longitude) }
 	
 	//private setBookId() { book.setBookId() }
 	//private setUserId() { user.setUserId() }

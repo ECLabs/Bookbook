@@ -62,28 +62,28 @@ class User {
 	public String getFacebookUpdateTime() { underlyingNode.getProperty("facebookUpdateTime", null) }
 	public String getGender() { underlyingNode.getProperty("gender", null) }
 	
-	public void setUserId(Long value) { underlyingNode.setProperty("id", value) }
-	public void setFirstName(String value) { underlyingNode.setProperty("firstName", value) }
-	public void setLastName(String value) { underlyingNode.setProperty("lastName", value) }
-	public void setMiddleName(String value) { if(value != null) underlyingNode.setProperty("middleName", value) }
-	public void setFullName(String value) { if(value != null) underlyingNode.setProperty("fullName", value) }
-	public void setUserName(String value) { underlyingNode.setProperty("userName", value) }
-	public void setEmail(String value) { underlyingNode.setProperty("email", value) }
-	public void setPassword(String value) { underlyingNode.setProperty("password", value) }
-	public void setPhotoUrl(String value) { underlyingNode.setProperty("photoUrl", value) }
-	public void setCreateDate(String value) { underlyingNode.setProperty("createDate", value) }
-	public void setEndDate(String value) { underlyingNode.setProperty("endDate", value) }
-	public void setUpdateDate(String value) { underlyingNode.setProperty("updateDate", value) }
-	public void setLastLoginDate(String value) { underlyingNode.setProperty("lastLoginDate", value) }
-	public void setUserTypeCode(String value) { underlyingNode.setProperty("userTypeCode", value) }
-	public void setLocation(String value) { underlyingNode.setProperty("location", value) }
-	public void setAboutMe(String value) { underlyingNode.setProperty("aboutMe", value) }
-	public void setActivationMethod(String value) { underlyingNode.setProperty("activationMethod", value) }
-	public void setNumberOfFollowers(String value) { underlyingNode.setProperty("numberOfFollowers", value) }
-	public void setNumberFollowing(String value) { underlyingNode.setProperty("numberFollowing", value) }
-	public void setGender(String value) { underlyingNode.setProperty("gender", value) }
-	public void setFacebookId(String value) { underlyingNode.setProperty("facebookId", value) }
-	public void setFacebookUpdateTime(String value) { underlyingNode.setProperty("facebookUpdateTime", value) }
+	public void setUserId(Long value) { if(value) underlyingNode.setProperty("id", value) }
+	public void setFirstName(String value) { if(value) underlyingNode.setProperty("firstName", value) }
+	public void setLastName(String value) { if(value) underlyingNode.setProperty("lastName", value) }
+	public void setMiddleName(String value) { if(value) underlyingNode.setProperty("middleName", value) }
+	public void setFullName(String value) { if(value) underlyingNode.setProperty("fullName", value) }
+	public void setUserName(String value) { if(value) underlyingNode.setProperty("userName", value) }
+	public void setEmail(String value) { if(value) underlyingNode.setProperty("email", value) }
+	public void setPassword(String value) { if(value) underlyingNode.setProperty("password", value) }
+	public void setPhotoUrl(String value) { if(value) underlyingNode.setProperty("photoUrl", value) }
+	public void setCreateDate(String value) { if(value) underlyingNode.setProperty("createDate", value) }
+	public void setEndDate(String value) { if(value) underlyingNode.setProperty("endDate", value) }
+	public void setUpdateDate(String value) { if(value) underlyingNode.setProperty("updateDate", value) }
+	public void setLastLoginDate(String value) { if(value) underlyingNode.setProperty("lastLoginDate", value) }
+	public void setUserTypeCode(String value) { if(value) underlyingNode.setProperty("userTypeCode", value) }
+	public void setLocation(String value) { if(value) underlyingNode.setProperty("location", value) }
+	public void setAboutMe(String value) { if(value) underlyingNode.setProperty("aboutMe", value) }
+	public void setActivationMethod(String value) { if(value) underlyingNode.setProperty("activationMethod", value) }
+	public void setNumberOfFollowers(String value) { if(value) underlyingNode.setProperty("numberOfFollowers", value) }
+	public void setNumberFollowing(String value) { if(value) underlyingNode.setProperty("numberFollowing", value) }
+	public void setGender(String value) { if(value) underlyingNode.setProperty("gender", value) }
+	public void setFacebookId(String value) { if(value) underlyingNode.setProperty("facebookId", value) }
+	public void setFacebookUpdateTime(String value) { if(value) underlyingNode.setProperty("facebookUpdateTime", value) }
 	static transients = ["underlyingNode", "recentCheckIns","bookLists","numberOfFollowers","numberFollowing"]
 }
 

@@ -61,34 +61,34 @@ class Book {
 	}
 	
 	public void setTitle(String value) {
-		underlyingNode.setProperty("title", value)	
+		if(value) underlyingNode.setProperty("title", value)	
 	}	
 	public void setAuthor(String value) {
-		underlyingNode.setProperty("author", value)
+		if(value) underlyingNode.setProperty("author", value)
 	}
 	public void setDescription(String value) {
-		underlyingNode.setProperty("description", value)
+		if(value) underlyingNode.setProperty("description", value)
 	}
 	public void setIsbn10(String value) {
-		underlyingNode.setProperty("isbn10", value)
+		if(value) underlyingNode.setProperty("isbn10", value)
 	}
 	public void setSmallThumbnailUrl(String value) {
-		underlyingNode.setProperty("smallThumbnailUrl", value)
+		if(value) underlyingNode.setProperty("smallThumbnailUrl", value)
 	}
 	public void setThumbnailUrl(String value) {
 		underlyingNode.setProperty("thumbnailUrl", value)
 	}
 	public void setPubType(String value) {
-		underlyingNode.setProperty("pubType", value)
+		if(value) underlyingNode.setProperty("pubType", value)
 	}
 	public void setCreateDate(String value) {
-		underlyingNode.setProperty("createDate", value)
+		if(value) underlyingNode.setProperty("createDate", value)
 	}
 	public void setCreatorUserId(Long value) {
-		underlyingNode.setProperty("creatorUserId", value)
+		if(value) underlyingNode.setProperty("creatorUserId", value)
 	}
 	public void setBookId(Long value) {
-		underlyingNode.setProperty("id", value)
+		if(value) underlyingNode.setProperty("id", value)
 	}
 	
     static constraints = {

@@ -72,6 +72,7 @@ log4j = {
 	def customLayout = new CustomHtmlLayout()
 
 	appenders {
+		console name: 'stdout', layout: pattern(conversionPattern: '%d{dd-MM-yy HH:mm:ss} %-5p [%c{2}] %m%n')
 		rollingFile  name:'errorLog', pattern: pattern(conversionPattern: "%c{2} %m%n"), file:'bookup.error.log', threshold: org.apache.log4j.Level.ERROR, maxFileSize:102400, maxBackupIndex:5
 		rollingFile  name:'errorLogHtml', layout: customLayout, file:'bookup.errorlog.html', threshold: org.apache.log4j.Level.ERROR, maximumFileSize:102400, maxBackupIndex:5
 	}

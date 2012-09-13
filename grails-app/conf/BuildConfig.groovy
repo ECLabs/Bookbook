@@ -2,6 +2,7 @@ grails.project.class.dir = "target/classes"
 grails.project.test.class.dir = "target/test-classes"
 grails.project.test.reports.dir = "target/test-reports"
 //grails.project.war.file = "target/${appName}-${appVersion}.war"
+
 grails.project.dependency.resolution = {
 	pom true
     // inherit Grails' default dependencies
@@ -11,6 +12,7 @@ grails.project.dependency.resolution = {
     }
     log "warn" // log level of Ivy resolver, either 'error', 'warn', 'info', 'debug' or 'verbose'
     repositories {
+		mavenRepo "http://snapshots.repository.codehaus.org" // this is here to resolve an issue with grails not finding org.codehaus.groovy#groovy;1.7.12-SNAPSHOT!groovy.jar 
         grailsPlugins()
         grailsHome()
         grailsCentral()
@@ -28,5 +30,6 @@ grails.project.dependency.resolution = {
         // specify dependencies here under either 'build', 'compile', 'runtime', 'test' or 'provided' scopes eg.
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
+		runtime "hsqldb:hsqldb:1.8.0.10"
     }
 }

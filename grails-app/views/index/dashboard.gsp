@@ -8,7 +8,7 @@
 <meta name="author" content="">
 <!-- Le styles -->
 <link rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
-<link rel="stylesheet" href="${resource(dir:'css',file:'bootstrap-responsive.css')}" />
+
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <style type="text/css">
 body {
@@ -19,6 +19,7 @@ body {
 	padding: 9px 0;
 }
 </style>
+<link rel="stylesheet" href="${resource(dir:'css',file:'bootstrap-responsive.css')}" />
 
 <!-- Le HTML5 shim, for IE6-8 support of HTML5 elements -->
 <!--[if lt IE 9]>

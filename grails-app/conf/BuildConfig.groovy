@@ -31,5 +31,13 @@ grails.project.dependency.resolution = {
 
         // runtime 'mysql:mysql-connector-java:5.1.13'
 		runtime "hsqldb:hsqldb:1.8.0.10"
+		compile("org.codehaus.groovy.modules.http-builder:http-builder:0.5.2"){
+			excludes "groovy"
+		}
     }
+	plugins {
+		build(":tomcat:$grailsVersion") {
+			export = false
+		}
+	}
 }

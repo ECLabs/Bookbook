@@ -200,10 +200,20 @@ class BookController {
 		}
 		
 		// combine into one list
-		externals.addAll(internals)
+		if(internals)
+			externals.addAll(internals)
 		
 		// add the books into a Map so we can eliminate duplicates - preferences for books with BookUp IDs
-		for(Book book in externals) {
+		for(def book in externals) {
+			/*
+			Book book = new Book()
+			if (b instanceof GoogleBook) {
+				copyProperties(b, book)
+			}
+			else {
+				book = b
+			}
+			*/
 			def isbn = book.isbn10.replaceFirst("^0+", "") // strip leading zeros from ISBN first - comes from Google with a leading zero
 			//book.isbn10 = book.isbn10.replaceFirst("^0+", "")
 			if(combined[(isbn)]) { // if the book is already in the map, see if we need to replace it
@@ -219,6 +229,19 @@ class BookController {
 		
 		return combined.values();
 	}
+	
+	def copyProperties(def source, def target){
+	   target.metaClass.properties.each{
+	      if (source.metaClass.hasProperty(source, it.name) && 
+			  it.name != 'metaClass' && 
+			  it.name != 'class' && 
+			  it.name != 'validationSkipMap' &&
+			  it.name != 'gormPersistentEntity')
+	         it.setProperty(target, source.metaClass.getProperty(source, it.name))
+	   }
+	}
+
+	
 }
 
 

@@ -15,7 +15,7 @@ public class CustomDomainMarshaller implements ObjectMarshaller<JSON> {
     static EXCLUDED = ['metaClass','class','id','version','underlyingNode','underlyingRel'];
 
     public boolean supports(Object object) {
-        return ConverterUtil.isDomainClass(object.getClass());
+        return ConverterUtil.isConverterClass(object.getClass());
     }
 
     public void marshalObject(Object o, JSON json) throws ConverterException {

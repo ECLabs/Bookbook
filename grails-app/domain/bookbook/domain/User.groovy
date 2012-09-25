@@ -39,7 +39,9 @@ class User {
 		this.underlyingNode = node
 	}
 	
-	public Long getUserId() { underlyingNode.getProperty("id", null) }
+	public Long getUserId() { 
+		underlyingNode.getProperty("id", null) 
+	}
 	public String getFirstName() { underlyingNode.getProperty("firstName", null) }
 	public String getLastName() { underlyingNode.getProperty("lastName", null) }
 	public String getMiddleName() { underlyingNode.getProperty("middleName", null) }
@@ -62,7 +64,10 @@ class User {
 	public String getFacebookUpdateTime() { underlyingNode.getProperty("facebookUpdateTime", null) }
 	public String getGender() { underlyingNode.getProperty("gender", null) }
 	
-	public void setUserId(Long value) { if(value) underlyingNode.setProperty("id", value) }
+	public void setUserId(Long value) { 
+		if(value) 
+			underlyingNode.setProperty("id", value) 
+	}
 	public void setFirstName(String value) { if(value) underlyingNode.setProperty("firstName", value) }
 	public void setLastName(String value) { if(value) underlyingNode.setProperty("lastName", value) }
 	public void setMiddleName(String value) { if(value) underlyingNode.setProperty("middleName", value) }

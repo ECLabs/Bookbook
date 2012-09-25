@@ -18,10 +18,9 @@ class BookController {
 	
 	def books = {
 		log.info "in books(). Parameters are ${params.toString()}"
-		youSearchedFor = "12 Results for query \"${params.title}\""
 		queryReturn = params.title
 		if(params.title) {
-			books = findAllSources2(params)
+			books = findAllSources(params)
 			for(b in books) {
 				jsonBookArray.push(b as JSON)
 			}
@@ -58,21 +57,13 @@ class BookController {
 		if(params.size() > 2) { // action and controller are default params
 			log.debug "still in findAll() - this is a search operation"
 			def books = findAllSources(params)
-			if(books && books == -1) { // invalid query
-				response.sendError(javax.servlet.http.HttpServletResponse.SC_BAD_REQUEST) // 400
-			}
-			else if(books) {
-				render books as JSON
-				return
-			}
-			else {
-				// TODO: wrap this stuff in exception handlers so we don't have to include in every function
-				response.sendError(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR) // 400
-			}
-			
+			render books as JSON			
 		}
-		// otherwise, just return all books
-		render bookService.findAllBooks() as JSON
+		else {
+			// otherwise, just return all books
+			render bookService.findAllBooks() as JSON
+		}
+		
 	}
 	
 	def add = {
@@ -152,14 +143,14 @@ class BookController {
 			internals = bookService.findBooksByProperty("author", parameters.author)
 		}
 		else {
-			return -1; // invalid query
+			return []; // invalid query
 		}
 		
 		// combine into one list
 		externals.addAll(internals)
 		
 		// add the books into a Map so we can eliminate duplicates - preferences for books with BookUp IDs
-		for(Book book in externals) {
+		for(book in externals) {
 			def isbn = book.isbn10.replaceFirst("^0+", "") // strip leading zeros from ISBN first - comes from Google with a leading zero
 			//book.isbn10 = book.isbn10.replaceFirst("^0+", "") 
 			if(combined[(isbn)]) { // if the book is already in the map, see if we need to replace it
@@ -173,61 +164,7 @@ class BookController {
 			
 		}
 		
-		render combined.values() as JSON
-	}
-	
-	def findAllSources2(parameters) {
-		log.info "in findAllSources(). Parameters are ${params.toString()}"
-		
-		def externals = []
-		def internals = []
-		def combined = [:]
-		
-		if(parameters.isbn10) {
-			externals = bookService.findGoogleBooks("isbn", parameters.isbn10, 0, 10)
-			internals = bookService.findBooksByProperty("isbn10", parameters.isbn10)
-		}
-		else if(parameters.title) {
-			externals = bookService.findGoogleBooksByTitle(parameters.title, parameters.page)
-			internals = bookService.findBooksByProperty("title", parameters.title)
-		}
-		else if(parameters.author) {
-			externals = bookService.findGoogleBooksByAuthor(parameters.author, parameters.page)
-			internals = bookService.findBooksByProperty("author", parameters.author)
-		}
-		else {
-			return []; // invalid query
-		}
-		
-		// combine into one list
-		if(internals)
-			externals.addAll(internals)
-		
-		// add the books into a Map so we can eliminate duplicates - preferences for books with BookUp IDs
-		for(def book in externals) {
-			/*
-			Book book = new Book()
-			if (b instanceof GoogleBook) {
-				copyProperties(b, book)
-			}
-			else {
-				book = b
-			}
-			*/
-			def isbn = book.isbn10.replaceFirst("^0+", "") // strip leading zeros from ISBN first - comes from Google with a leading zero
-			//book.isbn10 = book.isbn10.replaceFirst("^0+", "")
-			if(combined[(isbn)]) { // if the book is already in the map, see if we need to replace it
-				if(book.getBookId() != null) { // replace with this one, prefer the one with an ID
-					combined[(isbn)] = book
-				}
-			}
-			else {
-				combined.put(isbn, book)
-			}
-			
-		}
-		
-		return combined.values();
+		return combined.values()
 	}
 	
 	def copyProperties(def source, def target){

@@ -1007,8 +1007,9 @@ class UserFactory {
 			userId = getNextId()
 			return it
 		}
-		
-		log.debug "userId: ${u.userId}"
+
+		log.debug "New user under creation with ID of " + u.getUserId()
+
 		// add to index
 		userIndex.add(userNode, "id", u.userId)
 		return u
@@ -1052,7 +1053,7 @@ class UserFactory {
 		catch ( e )
 		{
 			// Create a new counter
-			counter = 0L;
+			counter = 1L;
 			log.debug "counter2: ${counter}"
 		}
 		

@@ -31,8 +31,6 @@ import bookbook.domain.GoogleBook
 import bookbook.domain.User
 
 class BookService {
-	
-	private static final log = LogFactory.getLog(this)
 
 	// Google Books API Oauth2
     static transactional = false
@@ -155,7 +153,7 @@ class BookService {
 			{
 				public boolean isReturnableNode( TraversalPosition pos )
 				{
-					log.debug "current value = " + pos.currentNode().getProperty(property, null)
+					log.trace "current value = " + pos.currentNode().getProperty(property, null)
 					if(value instanceof java.lang.String && !property.toLowerCase().equals("isbn")) {
 						return !pos.isStartNode() &&
 							pos.currentNode().getProperty(property, null).toLowerCase().contains(value.toLowerCase())
@@ -167,7 +165,7 @@ class BookService {
 			RelTypes.BOOK, Direction.OUTGOING
 		);
 		
-		def allBooks = []
+		def allBooks = new ArrayList()
 		
 		Transaction tx = graphDb.beginTx()
 		try {
@@ -185,7 +183,7 @@ class BookService {
 		finally {
 			tx.finish()
 		}
-		
+
 		log.debug "found ${allBooks.size()}"
 		return allBooks
 	}
@@ -308,7 +306,10 @@ class BookService {
 		log.debug "data-" + data.toString()
 		CheckIn ci = null
 		User u = userService.findUsersByProperty("id", userId)
-		Book b = this.findBooksByProperty("id", bookId)
+		def b = this.findBooksByProperty("id", bookId)
+		if(b instanceof java.util.List && b.size() > 0) {
+			b = b.first
+		}
 		
 		// check for existing relationship
 		/* allow more than one check-in for the same book/user combo

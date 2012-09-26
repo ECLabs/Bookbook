@@ -21,7 +21,6 @@ import bookbook.domain.User2
 import org.apache.commons.logging.LogFactory
 
 class UserService {
-	private static final log = LogFactory.getLog(this)
     static transactional = true
 	
 	//neo4j
@@ -124,6 +123,14 @@ class UserService {
 		finally {
 			tx.finish()
 		}
+		
+		log.debug "about to send email to ${u.userName} with email address = ${u.email}"
+		sendMail {
+		  to u.email
+		  subject "Welcome to BookUp!"
+		  html "<b>Hello</b> ${u.userName}!<br/><br/>You've signed up for BookUp.  Thanks for giving BookUp a try.  Enjoy!"
+		}
+		
 		return u
 	}
 	def updateUser(userIn, userId) {

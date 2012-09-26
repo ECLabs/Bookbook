@@ -84,7 +84,7 @@ log4j = {
 	}
 
     error  'org.codehaus.groovy.grails.web.servlet',  //  controllers
-           'org.codehaus.groovy.grails.web.pages', //  GSP
+		   'org.codehaus.groovy.grails.web.pages', //  GSP
            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
            'org.codehaus.groovy.grails.web.mapping', // URL mapping
@@ -94,10 +94,11 @@ log4j = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 		   
-
 	debug   'grails.app',
 			'grailsee.SimpleTraceInterceptor',
 			'grails.app.domain',
+			'grails.app.service.BookService',
+			'bookbook.bookbook.service',
 			'bookbook.domain'
 	
 	
@@ -106,3 +107,16 @@ log4j = {
 }
 
 grails.converters.json.date = 'javascript'
+
+grails {
+	mail {
+		host = "smtp.gmail.com"
+		port = 465
+		username = "mindstate@gmail.com"
+		password = "M2ndstate"
+		props = ["mail.smtp.auth":"true",
+				 "mail.smtp.socketFactory.port":"465",
+				 "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
+				 "mail.smtp.socketFactory.fallback":"false"]
+	} 
+}

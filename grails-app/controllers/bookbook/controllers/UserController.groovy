@@ -48,11 +48,7 @@ class UserController {
 		if(addedUser) {
 			updatePhoto(addedUser.userId, b)
 			render addedUser as JSON
-		}	
-		
-		
-		
-					
+		}			
 	}
 	/**
 	 * Example URIs:

@@ -34,6 +34,7 @@ grails.project.dependency.resolution = {
 		compile("org.codehaus.groovy.modules.http-builder:http-builder:0.5.2"){
 			excludes "groovy"
 		}
+		compile "org.grails.plugins:mail:1.0"
     }
 	plugins {
 		build(":tomcat:$grailsVersion") {

@@ -127,7 +127,7 @@ class UserService {
 		log.debug "about to send email to ${u.userName} with email address = ${u.email}"
 		sendMail {
 		  to u.email
-		  subject "Welcome to BookUp!"
+		  subject "Welcome to BookUP!"
 		  html "<b>Hello</b> ${u.userName}!<br/><br/>You've signed up for BookUp.  Thanks for giving BookUp a try.  Enjoy!"
 		}
 		

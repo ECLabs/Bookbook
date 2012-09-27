@@ -10,6 +10,9 @@
 //    grails.config.locations << "file:" + System.properties["${appName}.config.location"]
 // }
 
+// NOTE:  Need to change the location of these external config files if the app name changes
+grails.config.locations = [ "file:${userHome}/.grails/${appName}-config.groovy"]
+
 grails.project.groupId = appName // change this to alter the default package name and Maven publishing destination
 grails.mime.file.extensions = true // enables the parsing of file extensions from URLs into the request format
 grails.mime.use.accept.header = false
@@ -54,13 +57,13 @@ grails.exceptionresolver.params.exclude = ['password']
 // set per-environment serverURL stem for creating absolute links
 environments {
     production {
-        grails.serverURL = "http://www.changeme.com"
+        
     }
     development {
-        grails.serverURL = "http://localhost:8080/${appName}"
+
     }
     test {
-        grails.serverURL = "http://localhost:8080/${appName}"
+
     }
 
 }
@@ -88,7 +91,6 @@ log4j = {
            'org.codehaus.groovy.grails.web.sitemesh', //  layouts
            'org.codehaus.groovy.grails.web.mapping.filter', // URL mapping
            'org.codehaus.groovy.grails.web.mapping', // URL mapping
-           'org.codehaus.groovy.grails.commons', // core / classloading
            'org.codehaus.groovy.grails.plugins', // plugins
            'org.springframework',
            'org.hibernate',
@@ -103,20 +105,10 @@ log4j = {
 	
 	
 
-    warn   'org.mortbay.log'
+    warn   'org.mortbay.log',
+		   'org.codehaus.groovy.grails.commons' // core / classloading
 }
 
 grails.converters.json.date = 'javascript'
 
-grails {
-	mail {
-		host = "smtp.gmail.com"
-		port = 465
-		username = "mindstate@gmail.com"
-		password = "M2ndstate"
-		props = ["mail.smtp.auth":"true",
-				 "mail.smtp.socketFactory.port":"465",
-				 "mail.smtp.socketFactory.class":"javax.net.ssl.SSLSocketFactory",
-				 "mail.smtp.socketFactory.fallback":"false"]
-	} 
-}
+

@@ -176,6 +176,16 @@
         			data: {jsondata : "{'bookId':"+bookId+",'listType':'" +listType+"','listTitle':'"+listTitle+"','creationType':'"+creationType+"'}"}
         		}).done(function(msg) { alert("data saved - refreshing page"); document.location.reload(); });
         	}
+        	
+        	function deleteListEntry() {
+				var url = "api/list/delete/bookListId-"
+				var id = $('#lists_delete').val()
+				url = url + id
+        		$.ajax({
+        			url: url,
+        			type: 'GET'
+        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
+        	}
         </g:javascript>
     </head>
     <body>
@@ -601,7 +611,25 @@
                         </tr>
                     </g:each>
                     </tbody>
-                </table> 		
+                </table> 	
+                
+                <h2>Delete a list entry</h2>
+                <table style="width: 600px;border-collapse:collapse" border="1" bordercolor="gray">
+					<tr>
+						<td width="120">BookListId:</td>
+						<td>
+							<g:select name="lists_delete"
+					          from="${bookLists}"
+					          optionValue="${{'BookListId'+it.bookListId+':BookId'+it.book.bookId+':UserId'+it.user.userId}}"
+					          optionKey="bookListId" />					
+	          			</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<input type="submit" value="Delete list entry" name="button" onclick="deleteListEntry()" />
+						</td>
+					</tr>
+				</table>	
 	    </div>
     </body>
 </html>

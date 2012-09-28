@@ -57,7 +57,7 @@ class ListController {
 		def l = JSON.parse(params['jsondata'])
 		def userId = params['userId']
 		
-		listService.addListEntry(userId, l.bookId, l.listType, l.title)
+		listService.addListEntry(userId, l.bookId, l.listType, l.listTitle)
 		render "done"
 	}
 	
@@ -69,8 +69,11 @@ class ListController {
 		render "not yet implemented"
 	}
 	
-	def removeList = {
-		render "not yet implemented"
+	def removeListEntry = {
+		log.info "in removeListEntry(). Parameters are ${params.toString()}"
+		
+		listService.deleteListEntry(params.bookListId)
+		render "book list deleted successfully!"
 	}
 	
 	def removeBookFromList = {

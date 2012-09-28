@@ -3,6 +3,7 @@ package bookbook.services
 import bookbook.domain.Book
 import bookbook.domain.BookList
 import bookbook.domain.User
+import grails.converters.JSON
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
 
@@ -13,11 +14,10 @@ import org.neo4j.graphdb.ReturnableEvaluator;
 import org.neo4j.graphdb.Transaction
 import org.neo4j.graphdb.Direction
 import org.neo4j.graphdb.TraversalPosition;
+import org.neo4j.graphdb.index.IndexHits
 import org.apache.commons.logging.LogFactory
 
 class ListService {
-	
-	private static final log = LogFactory.getLog(this)
 
     static transactional = false
 
@@ -36,7 +36,7 @@ class ListService {
 		log.debug "############### initialize() in ListService - Loading graphDb, shutdownHook."
 		//graphDb = new EmbeddedGraphDatabase( DB_PATH );
 		//registerShutdownHook();
-		listIndex = graphDb.index().forNodes("lists")
+		listIndex = graphDb.index().forRelationships("lists")
 		listsReferenceNode = this.getSubReferenceNode(RelTypes.LISTS_REFERENCE)
 		
 	}
@@ -97,7 +97,8 @@ class ListService {
 			
 			// get new ID 
 			Relationship rel = u.underlyingNode.createRelationshipTo(b.underlyingNode, RelTypes.valueOf(relType))
-			bl = new BookList(rel).with {
+			bl = new BookList(rel)
+			bl.with {
 				type = relType
 				createDate = new Date().toString()
 				title = title
@@ -107,8 +108,9 @@ class ListService {
 			log.debug "booklistobject:" + bl
 			
 			// add to index
-			def listIndex = graphDb.index().forRelationships("lists")
+			//def listIndex = graphDb.index().forRelationships("lists")
 			log.debug "bookListId - ${bl.bookListId}"
+			log.debug "title - ${bl.title}"
 			
 			listIndex.add(bl.underlyingRel, "id", bl.bookListId)
 			listIndex.add(bl.underlyingRel, "bookId", b.bookId)
@@ -128,6 +130,28 @@ class ListService {
 		}
 		log.debug "list creation successful."
 		return bl
+	}
+	
+	def deleteListEntry(bookListId) {
+		//def index = graphDb.index().forRelationships("lists")
+		IndexHits<Relationship> rels = listIndex.get("id", bookListId)
+		Relationship rel = rels.getSingle()
+		
+		Transaction tx = graphDb.beginTx()
+		try {
+			rel.delete()
+			listIndex.remove(rel)
+			tx.success()
+		}
+		catch(e) {
+			tx.failure()
+			log.error e.toString()
+			return false
+		}
+		finally {
+			tx.finish()
+		}
+		return true
 	}
 	
 	def findListsByBookId(bookId, listType) {
@@ -194,7 +218,7 @@ class ListService {
 		catch ( e )
 		{
 			// Create a new counter
-			counter = 0L;
+			counter = 1L;
 		}
 		listsReferenceNode.setProperty( KEY_COUNTER, new Long( counter + 1 ) );
 		return counter;
@@ -238,7 +262,7 @@ class ListService {
 		catch ( e )
 		{
 			// Create a new counter
-			counter = 0L;
+			counter = 1L; // RJE: not sure why, but adding the first list did not work until I changed this from 0L to 1L
 			log.debug "counter2: ${counter}"
 		}
 		

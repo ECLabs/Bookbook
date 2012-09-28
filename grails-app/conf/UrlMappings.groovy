@@ -106,6 +106,10 @@ class UrlMappings {
 		"/api/list/bookId-$bookId"(controller:"list") {
 			action = [GET:"findListsByBookId"]
 		}
+		
+		"/api/list/delete/bookListId-$bookListId"(controller:"list") {
+			action = [GET:"removeListEntry"]
+		}
 		/* Can't get queries by relationship type to work yet, so we'll have to get them all from the 
 		 * above query
 		 *

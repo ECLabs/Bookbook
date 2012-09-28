@@ -349,7 +349,7 @@ class BookService {
 			catch ( e )
 			{
 				// Create a new counter
-				counter = 0L;
+				counter = 1L;
 			}
 			booksReferenceNode.setProperty( CHECK_IN_KEY_COUNTER, new Long( counter + 1 ) );
 			
@@ -547,7 +547,7 @@ class BookFactory {
 		
 		def counter = getNextId()
 		Book b = new Book(bookNode).with {
-			bookId = getNextId()
+			bookId = counter
 			return it
 		}
 		
@@ -590,7 +590,7 @@ class BookFactory {
 		catch ( e )
 		{
 			// Create a new counter
-			counter = 0L;
+			counter = 1L;
 		}
 		
 		booksReferenceNode.setProperty( KEY_COUNTER, new Long( counter + 1 ) );

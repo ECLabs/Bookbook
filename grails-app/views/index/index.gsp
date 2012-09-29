@@ -613,7 +613,24 @@
                     </tbody>
                 </table> 	
                 
-                	
+                <h2>Delete a list entry</h2>
+                <table style="width: 600px;border-collapse:collapse" border="1" bordercolor="gray">
+					<tr>
+						<td width="120">BookListId:</td>
+						<td>
+							
+							<g:select name="lists_delete"
+					          from="${bookLists}"
+					          optionValue="${{'BookListId'+it?.bookListId+':BookId'+it?.book.bookId+':UserId'+it?.user.userId}}"
+					          optionKey="bookListId" />	
+	          			</td>
+					</tr>
+					<tr>
+						<td colspan="2">
+							<input type="submit" value="Delete list entry" name="button" onclick="deleteListEntry()" />
+						</td>
+					</tr>
+				</table>
 	    </div>
     </body>
 </html>

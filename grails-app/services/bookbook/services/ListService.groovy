@@ -155,13 +155,29 @@ class ListService {
 	}
 	
 	def findListsByBookId(bookId, listType) {
-		def listIndex = graphDb.index().forRelationships("lists")
+		//def listIndex = graphDb.index().forRelationships("lists")
 		def b = bookService.findBooksByProperty("id", bookId)
 		def rels = listIndex.query(null, null, b.underlyingNode)
 		def allLists = []
 		for(rel in rels) {
 			BookList bl = new BookList(rel)
-			allLists.push(bl)
+			
+			if(!bl.bookListId) { // cleanup - delete invalid booklists
+				log.debug("cleaning up invalid booklists....")
+				Transaction tx = graphDb.beginTx()
+				try {
+					rel.delete()
+					listIndex.remove(rel)
+					tx.success()
+				}
+				catch(e) {
+					tx.failure()
+					log.error e.toString()
+				}	
+			}
+			else {
+				allLists.push(bl)
+			}
 		}
 		log.debug "found [${allLists.size()}] lists for book [${b.title}] as End Node"
 		

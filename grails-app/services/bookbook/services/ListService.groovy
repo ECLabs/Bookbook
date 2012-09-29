@@ -163,11 +163,14 @@ class ListService {
 			BookList bl = new BookList(rel)
 			
 			if(!bl.bookListId) { // cleanup - delete invalid booklists
-				log.debug("cleaning up invalid booklists....")
+				log.debug("###########################################")
+				log.debug("#### cleaning up invalid booklists.... ####")
 				Transaction tx = graphDb.beginTx()
 				try {
 					rel.delete()
+					log.debug("after deleting rel")
 					listIndex.remove(rel)
+					log.debug("after deleting index entry")
 					tx.success()
 				}
 				catch(e) {

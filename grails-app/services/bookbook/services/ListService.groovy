@@ -159,12 +159,22 @@ class ListService {
 		def b = bookService.findBooksByProperty("id", bookId)
 		def rels = listIndex.query(null, null, b.underlyingNode)
 		def allLists = []
+		def relsToDelete = []
 		for(rel in rels) {
 			BookList bl = new BookList(rel)
 			
 			if(!bl.bookListId) { // cleanup - delete invalid booklists
-				log.debug("###########################################")
-				log.debug("#### cleaning up invalid booklists.... ####")
+				log.error "Found an invalid book list.  Adding to queue for deletion."
+				relsToDelete.push rel
+			}
+			else {
+				allLists.push(bl)
+			}
+		}
+		if(relsToDelete) {
+			log.debug("###########################################")
+			log.debug("#### cleaning up invalid booklists.... ####")
+			for(rel in rels) {
 				Transaction tx = graphDb.beginTx()
 				try {
 					rel.delete()
@@ -176,11 +186,9 @@ class ListService {
 				catch(e) {
 					tx.failure()
 					log.error e.toString()
-				}	
+				}
 			}
-			else {
-				allLists.push(bl)
-			}
+			
 		}
 		log.debug "found [${allLists.size()}] lists for book [${b.title}] as End Node"
 		

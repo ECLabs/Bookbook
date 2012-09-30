@@ -12,9 +12,11 @@ class BookController {
 
 	def GOOGLE_BOOKS_MAX_RESULTS_PER_SEARCH = 10
 	def bookService
+	def checkinService
 	def queryReturn
 	def youSearchedFor
 	def jsonBookArray = []
+	def graphDb
 	
 	def books = {
 		log.info "in books(). Parameters are ${params.toString()}"
@@ -29,6 +31,11 @@ class BookController {
 			books = bookService.findAllBooks()
 		}
 		
+	}
+	
+	def shutdown = {
+		log.info "Shutting down graph DB"
+		graphDb.shutdown()
 	}
 	
     def index = { 
@@ -104,11 +111,22 @@ class BookController {
 	
 	def establishCheckIn = {
 		def jsonCheckIn = JSON.parse(params.jsondata)
-		render bookService.createCheckIn(jsonCheckIn, params.bookId, jsonCheckIn.userId) as JSON
+		def returnVal = checkinService.addCheckin(jsonCheckIn, params.bookId, jsonCheckIn.userId)
+		if(returnVal == false) {
+			log.error("Unable to establish check-in")
+			response.sendError(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR) // 500
+		}
+		else
+			render returnVal as JSON	
+		
 	}
 	
 	def findCheckInsByBookId = {
-		render bookService.findCheckInsByBookId(params.bookId) as JSON
+		render checkinService.findCheckInsByBookId(params.bookId) as JSON
+	}
+	
+	def removeAllCheckIns = {
+		render bookService.deleteAllCheckIns()
 	}
 	
 	def getDummyCheckIn = {
@@ -123,6 +141,7 @@ class BookController {
 			longitude : "34 West")
 		render dummy as JSON
 	}
+	
 	def findAllSources(parameters) {
 		log.info "in findAllSources(). Parameters are ${params.toString()}"
 		

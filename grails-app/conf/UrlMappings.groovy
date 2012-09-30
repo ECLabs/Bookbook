@@ -83,12 +83,16 @@ class UrlMappings {
 			action = [GET:"findCheckInsByBookId", POST:"establishCheckIn"]
 		}
 		
-		"/api/user/$userName/checkIn"(controller:"user") {
+		"/api/user/$userId/checkIn"(controller:"user") {
 			action = [GET:"findCheckInsByUserId", POST:"establishCheckIn"]
 		}
 		
 		"/api/book/$id/checkInDummy"(controller:"book") {
 			action = [GET:"getDummyCheckIn"]
+		}
+		
+		"/api/book/checkIn/delete-all"(controller:"book") {
+			action = [GET:"removeAllCheckIns"]
 		}
 		
 		/**
@@ -145,6 +149,12 @@ class UrlMappings {
 		{
 			controller = "book"
 		}
+		"/shutdown"
+		{
+			controller = "book"
+			action = "shutdown"
+		}
+		
 		"500"(view:'/error')
 		
 		

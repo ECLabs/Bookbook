@@ -15,6 +15,7 @@ class UserController {
 
 	def userService
 	def bookService
+	def checkinService
 	def basePhotoPath = '/usr/bin/tomcat7/webapps/BookUpImages/'
 	def basePhotoUrl = 'http://labs.evanschambers.com:8080/BookUpImages/'
 	
@@ -188,13 +189,20 @@ class UserController {
 	
 	def establishCheckIn = {
 		log.info "In establishCheckIn(). Parameters are ${params.toString()}"
-		def jsonCheckIn = params.jsondata
-		render bookService.createCheckIn(jsonCheckIn, jsonCheckIn.bookId, params.userName)
+		def jsonCheckIn = JSON.parse(params.jsondata)
+		def returnVal = checkinService.addCheckin(jsonCheckIn, params.userId, jsonCheckIn.bookId)
+		if(returnVal == false) {
+			log.error("Unable to establish check-in")
+			response.sendError(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR) // 500
+		}
+		else
+			render returnVal as JSON
+		
 	}
 	
 	def findCheckInsByUserId = {
 		log.info "In findCheckInsByUserId(). Parameters are ${params.toString()}"
-		render bookService.findCheckInsByUserName(params.userName) as JSON
+		render checkinService.findCheckInsByUserId(params.userId) as JSON
 	}
 	
 	def createTestUsers = {

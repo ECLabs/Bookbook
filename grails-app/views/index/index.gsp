@@ -149,7 +149,7 @@
         		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
         	}
         	
-        	function createCheckIn() {
+        	function createCheckInBook() {
 				var url = "api/book";
 				var bookId = $('#books_createcheckin').val();
 				var userId = $('#users_createcheckin').val();
@@ -160,8 +160,23 @@
         			url: url,
         			type: 'POST',
         			data: {jsondata : "{'userId':"+userId+",'narrative':'"+narrative+"','chapterOrSection':'"+chapterOrSection+"','venue':null,'latitude':null,'longitude':null}" }
-        		}).done(function(msg) { alert("data saved "); document.location.reload(); });
+        		}).done(function(msg) { alert(JSON.stringify(msg)); document.location.reload(); });
         	}
+        	
+        	function createCheckInUser() {
+				var url = "api/user";
+				var bookId = $('#books_createcheckin').val();
+				var userId = $('#users_createcheckin').val();
+				var chapterOrSection = $('#chapterOrSection').val();
+				var narrative = $('#narrative').val();
+				url = url + "/" + userId + "/checkIn";
+        		$.ajax({
+        			url: url,
+        			type: 'POST',
+        			data: {jsondata : "{'bookId':"+bookId+",'narrative':'"+narrative+"','chapterOrSection':'"+chapterOrSection+"','venue':null,'latitude':null,'longitude':null}" }
+        		}).done(function(msg) { alert(JSON.stringify(msg)); document.location.reload(); });
+        	}
+        	
         	function addToList() {
 				var url = "api/list/";
 				var bookId = $('#books').val();
@@ -320,11 +335,12 @@
 					</tr>
 					<tr>
 						<td colspan="2">
-							<input type="submit" value="createCheckIn" name="button" onclick="createCheckIn()" />
+							<input type="submit" value="createCheckInBook" name="button" onclick="createCheckInBook()" />
+							<input type="submit" value="createCheckInUser" name="button" onclick="createCheckInUser()" />
 						</td>
 					</tr>
-					<!-- {"bookId":3,"checkInDate":"Sun Nov 13 22:51:42 EST 2011","class":"bookbook.DummyCheckIn","createDate":null,"id":123,"latitude":"12 North","longitude":"34 West","narrative":"this is what i think of this book!","userName":"evansro","venue":"Whole Food, Reston, VA","chapterOrSection":"Chapter 19"} -->
 				</table>
+				
 				
 				<h2>All Books</h2>
 				<table>

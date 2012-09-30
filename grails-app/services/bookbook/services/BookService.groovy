@@ -300,13 +300,73 @@ class BookService {
 			tx.finish()
 		}
 	}
-	
+	/*
 	def createCheckIn(data, bookId, userId) {
 		
 		log.debug "data-" + data.toString()
 		CheckIn ci = null
 		User u = userService.findUsersByProperty("id", userId)
 		def b = this.findBooksByProperty("id", bookId)
+		if(b instanceof java.util.List && b.size() > 0) {
+			b = b.first
+		}
+
+		Transaction tx = graphDb.beginTx()
+		try {
+			Relationship rel = u.underlyingNode.createRelationshipTo(b.underlyingNode, RelTypes.CHECK_IN)
+			ci = new CheckIn(rel).with {
+				checkInDate = new Date().toString()
+				createDate = new Date().toString()
+				narrative = data.narrative
+				venue = data.venue
+				chapterOrSection = data.chapterOrSection
+				latitude = data.latitude
+				longitude = data.longitude
+				return it
+			}
+			log.debug "checkinobject:" + ci
+			
+			// get id
+			def counter = null;
+			try
+			{
+				counter = booksReferenceNode.getProperty( CHECK_IN_KEY_COUNTER );
+			}
+			catch ( e )
+			{
+				// Create a new counter
+				counter = 1L;
+			}
+			booksReferenceNode.setProperty( CHECK_IN_KEY_COUNTER, new Long( counter + 1 ) );
+			
+			ci.checkInId = counter
+			
+			// add to index
+			def checkInIndex = graphDb.index().forRelationships("checkIns")
+			log.debug "adding checkin to index - checkInId: ${ci.checkInId}"
+			checkInIndex.add(ci.underlyingRel, "id", counter)
+			tx.success()
+		}
+		catch(e) {
+			tx.failure()
+			log.error e.toString()
+			return false
+		}
+		finally {
+			tx.finish()
+		}
+		log.debug "checkin successful."
+		return ci
+	}
+	*/
+	def createCheckIn(data, bookId, userId) {
+		
+		log.debug "data-" + data.toString()
+		CheckIn ci = null
+		User u = userService.findUsersByProperty("id", userId)
+		def b = this.findBooksByProperty("id", bookId)
+		
+		// make sure we only have one book
 		if(b instanceof java.util.List && b.size() > 0) {
 			b = b.first
 		}
@@ -325,6 +385,7 @@ class BookService {
 			}
 		}
 		*/
+		
 		Transaction tx = graphDb.beginTx()
 		try {
 			Relationship rel = u.underlyingNode.createRelationshipTo(b.underlyingNode, RelTypes.CHECK_IN)
@@ -373,6 +434,44 @@ class BookService {
 		return ci
 	}
 	
+	
+	/* TODO: This needs to be updated and moved to CheckinService */
+	def deleteAllCheckIns() {
+		def checkInIndex = graphDb.index().forRelationships("checkIns")
+		def books = findAllBooks()
+		def allCheckIns = []
+		for(b in books) {
+			def rels = checkInIndex.query(null, null, b.underlyingNode)
+			for(rel in rels) {
+				allCheckIns.push rel
+			}
+			
+		}
+		
+		def countDeleted = allCheckIns.size()
+		
+		for(rel in allCheckIns) {
+			Transaction tx = graphDb.beginTx()
+			try {
+				rel.delete()
+				log.debug("after deleting rel")
+				checkInIndex.remove(rel)
+				log.debug("after deleting index entry")
+				tx.success()
+			}
+			catch(e) {
+				tx.failure()
+				log.error e.toString()
+			}
+			finally {
+				tx.finish()
+			}
+		}
+		
+		log.debug "deleted ${countDeleted} checkins"
+		return "deleted ${countDeleted} checkins"
+	}
+	
 	def findCheckInsByUserName(userName) {
 		def checkInIndex = graphDb.index().forRelationships("checkIns")
 		def u = userService.findUsersByProperty("userName", userName)
@@ -397,30 +496,6 @@ class BookService {
 		log.debug "found [${allCheckIns2.size()}] check-ins in graph for user with userName [${u.userName}]"
 		
 		return allCheckIns2
-	}
-	
-	def findCheckInsByBookId(bookId) {
-		def allCheckIns = []
-		def checkInIndex = graphDb.index().forRelationships("checkIns")
-		def b = findBooksByProperty("id", bookId)
-		if(b instanceof ArrayList) return allCheckIns // TODO: clean this up
-		def rels = checkInIndex.query(null, null, b.underlyingNode)
-		
-		for(rel in rels) {
-			CheckIn ci = new CheckIn(rel)
-			allCheckIns.push(ci)
-		}
-		log.debug "found [${allCheckIns.size()}] check-ins for book [${b.title}]"
-		
-		def allCheckIns2 = []
-		def rels2 = b.underlyingNode.getRelationships(RelTypes.CHECK_IN, Direction.INCOMING)
-		for (rel2 in rels2) {
-			CheckIn ci = new CheckIn(rel2)
-			allCheckIns2.push(ci) // .equals() doesn't allow duplicates
-		}
-		log.debug "found [${allCheckIns2.size()}] check-ins in graph for book with bookId [${b.bookId}]"
-		
-		return allCheckIns 
 	}
 	
 	def deleteCheckIn(checkInId) {

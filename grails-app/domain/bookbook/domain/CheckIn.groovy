@@ -2,6 +2,9 @@ package bookbook.domain
 
 import org.neo4j.graphdb.Node;
 import org.neo4j.graphdb.Relationship
+import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.index.RelationshipIndex
+import org.neo4j.graphdb.Direction
 
 /**
  * Adding a checkin - JSON
@@ -23,50 +26,115 @@ class CheckIn {
 	String chapterOrSection
 	String latitude
 	String longitude
-	Relationship underlyingRel
+	Node underlyingNode
 	Book book
 	User user
+	RelationshipIndex index
 	
-    static constraints = { }
-	static transients = [ "underlyingRel", "book", "user" ]
-	
-	// Constructor
-	CheckIn(rel) { 
-		this.underlyingRel = rel
-		book = new Book(rel.getEndNode())
-		user = new User(rel.getStartNode())
+	def enum RelTypes implements RelationshipType
+	{
+		USERS_REFERENCE,
+		USER,
+		BOOKS_REFERENCE,
+		BOOK,
+		CHECK_IN,
+		CHECKINS_REFERENCE
 	}
 	
-	public Long getCheckInId() { underlyingRel.getProperty("id", null) }
+    static constraints = { }
+	static transients = [ "underlyingNode", "book", "user", "index" ]
+	
+	// Constructor
+	CheckIn(Node cNode) {
+		this.index = index
+		this.underlyingNode = cNode
+		
+		// get the related book
+		def bookRels = cNode.getRelationships(RelTypes.CHECK_IN, Direction.OUTGOING)
+		if(bookRels.hasNext()) {
+			book = new Book(bookRels.next().getEndNode())
+		}
+		
+		// get the related user
+		def userRels = cNode.getRelationships(RelTypes.CHECK_IN, Direction.INCOMING)
+		if(userRels.hasNext()) {
+			user = new User(userRels.next().getStartNode())
+		}
+	}
+	
+	// Constructor
+	CheckIn(Node cNode, RelationshipIndex index) {
+		this.index = index 
+		this.underlyingNode = cNode
+	}
+	
+	public Long getCheckInId() { 
+		underlyingNode.getProperty("id", null) 
+	}
 	public Long getBookId() { book.getBookId() }
 	public Long getUserId() { user.getUserId() }
-	public String getCheckInDate() { underlyingRel.getProperty("checkInDate", null) }
-	public String getCreateDate() { underlyingRel.getProperty("createDate", null) }
-	public String getNarrative() { underlyingRel.getProperty("narrative", null) }
+	public String getCheckInDate() { underlyingNode.getProperty("checkInDate", null) }
+	public String getCreateDate() { underlyingNode.getProperty("createDate", null) }
+	public String getNarrative() { underlyingNode.getProperty("narrative", null) }
 	public String getUserName() { user.getUserName() }
-	public String getVenue() { underlyingRel.getProperty("venue", null) }
-	public String getChapterOrSection() { underlyingRel.getProperty("chapterOrSection", null) }
-	public String getLatitude() { underlyingRel.getProperty("latitude", null) }
-	public String getLongitude() { underlyingRel.getProperty("longitude", null) }
-	public Relationship getUnderlyingRel() { return underlyingRel }
+	public String getVenue() { underlyingNode.getProperty("venue", null) }
+	public String getChapterOrSection() { underlyingNode.getProperty("chapterOrSection", null) }
+	public String getLatitude() { underlyingNode.getProperty("latitude", null) }
+	public String getLongitude() { underlyingNode.getProperty("longitude", null) }
+	public Relationship getunderlyingNode() { return underlyingNode }
 	public Book getBook() { return book }
 	public User getUser() { return user }
 	
-	public void setCheckInId(Long checkInId) { if(checkInId) underlyingRel.setProperty("id", checkInId) }
-	public void setCheckInDate(String checkInDate) { if(checkInDate) underlyingRel.setProperty("checkInDate", checkInDate) }
-	public void setCreateDate(String createDate) { if(createDate) underlyingRel.setProperty("createDate", createDate) }
-	public void setNarrative(String narrative) { if(narrative) underlyingRel.setProperty("narrative", narrative) }
-	public void setVenue(String venue) { if(venue) underlyingRel.setProperty("venue", venue) }
-	public void setChapterOrSection(String chapterOrSection) { if(chapterOrSection) underlyingRel.setProperty("chapterOrSection", chapterOrSection) }
-	public void setLatitude(String latitude) { if(latitude) underlyingRel.setProperty("latitude", latitude) }
-	public void setLongitude(String longitude) { if(longitude) underlyingRel.setProperty("longitude", longitude) }
+	public void setCheckInId(Long checkInId) { 
+		if(checkInId) 
+			underlyingNode.setProperty("id", checkInId) 
+	}
+	public void setCheckInDate(String checkInDate) { if(checkInDate) underlyingNode.setProperty("checkInDate", checkInDate) }
+	public void setCreateDate(String createDate) { if(createDate) underlyingNode.setProperty("createDate", createDate) }
+	public void setNarrative(String narrative) { if(narrative) underlyingNode.setProperty("narrative", narrative) }
+	public void setVenue(String venue) { if(venue) underlyingNode.setProperty("venue", venue) }
+	public void setChapterOrSection(String chapterOrSection) { if(chapterOrSection) underlyingNode.setProperty("chapterOrSection", chapterOrSection) }
+	public void setLatitude(String latitude) { if(latitude) underlyingNode.setProperty("latitude", latitude) }
+	public void setLongitude(String longitude) { if(longitude) underlyingNode.setProperty("longitude", longitude) }
+	public void setBook(Book book, RelationshipIndex index) { 
+		if(book) {
+			this.book = book
+		}
+	}
+	public void setUser(User user, RelationshipIndex index) {
+		if(user) {
+			this.user = user
+		}
+	}
+
+	@Override
+	public int hashCode() {
+		final int prime = 31;
+		int result = 1;
+		result = prime * result
+				+ ((checkInId == null) ? 0 : checkInId.hashCode());
+		return result;
+	}
+
+	@Override
+	public boolean equals(Object obj) {
+		if (obj == null) {
+			return false;
+		}
+		if (!(obj instanceof CheckIn)) {
+			return false;
+		}
+		CheckIn other = (CheckIn) obj;
+		if (getCheckInId() == null) {
+			if (other.getCheckInId() != null) {
+				return false;
+			}
+		} else if (!getCheckInId().equals(other.getCheckInId())) {
+			return false;
+		}
+		return true;
+	}
 	
-	//private setBookId() { book.setBookId() }
-	//private setUserId() { user.setUserId() }
 	
-	//private setUserName() { user.setUserName() }
-	//private setUnderlyingRel() { return underlyingRel }
-	//private setBook() { return book }
-	//private setUser() { return user }
 	
 }

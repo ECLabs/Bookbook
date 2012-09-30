@@ -97,12 +97,8 @@ log4j = {
            'org.hibernate',
            'net.sf.ehcache.hibernate'
 		   
-	debug   'grails.app',
-			'grailsee.SimpleTraceInterceptor',
-			'grails.app.domain',
-			'grails.app.service.BookService',
-			'bookbook.bookbook.service',
-			'bookbook.domain'
+	debug   'grailsee.SimpleTraceInterceptor',
+			'grails.app'
 	
 	
 

@@ -4,6 +4,8 @@ beans = {
 	props.setProperty('storeDir', 'bookbook-neo4j-store')
 	graphDb(org.neo4j.kernel.EmbeddedGraphDatabase, 'bookbook-neo4j-store') { }
 	
+	myShutdownHook(ShutdownHook)
+	
 	multipartResolver(org.springframework.web.multipart.commons.CommonsMultipartResolver) {
 		// Max in memory 100kbytes
 		maxInMemorySize=10240

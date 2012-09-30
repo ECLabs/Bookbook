@@ -187,8 +187,10 @@ class ListService {
 					tx.failure()
 					log.error e.toString()
 				}
+				finally {
+					tx.finish()
+				}
 			}
-			
 		}
 		log.debug "found [${allLists.size()}] lists for book [${b.title}] as End Node"
 		

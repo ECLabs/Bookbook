@@ -118,8 +118,11 @@ class CheckinService {
 				return it
 			}
 			
+			log.debug "about to create 1st relationship"
 			Relationship rel1 = c.underlyingNode.createRelationshipTo(b.underlyingNode, RelTypes.CHECK_IN)
+			log.debug "about to create 2nd relationship"
 			Relationship rel2 = u.underlyingNode.createRelationshipTo(c.underlyingNode, RelTypes.CHECK_IN)
+			log.debug "after creating 2nd relationship"
 			
 			checkInIndex.add(rel2, "userId", u.userId)
 			checkInIndex.add(rel1, "bookId", b.bookId)

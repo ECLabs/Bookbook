@@ -57,8 +57,15 @@ class CheckIn {
 		
 		// get the related user
 		def userRels = cNode.getRelationships(RelTypes.CHECK_IN, Direction.INCOMING)
-		if(userRels.hasNext()) {
+
+		def counter = 0
+		while(userRels.hasNext()) {
+			log.debug "associating user ****"
 			user = new User(userRels.next().getStartNode())
+			log.debug "User is [${user.userId}] ${counter}"
+			counter++
+			if(user.userId)
+				break
 		}
 	}
 	

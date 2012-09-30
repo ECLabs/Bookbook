@@ -81,7 +81,7 @@ class CheckIn {
 	public String getChapterOrSection() { underlyingNode.getProperty("chapterOrSection", null) }
 	public String getLatitude() { underlyingNode.getProperty("latitude", null) }
 	public String getLongitude() { underlyingNode.getProperty("longitude", null) }
-	public Relationship getunderlyingNode() { return underlyingNode }
+	public Node getUnderlyingNode() { return underlyingNode }
 	public Book getBook() { return book }
 	public User getUser() { return user }
 	

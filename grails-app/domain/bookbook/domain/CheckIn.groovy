@@ -71,8 +71,8 @@ class CheckIn {
 	public Long getCheckInId() { 
 		underlyingNode.getProperty("id", null) 
 	}
-	public Long getBookId() { book.getBookId() }
-	public Long getUserId() { user.getUserId() }
+	public Long getBookId() { if(book) book.getBookId() }
+	public Long getUserId() { if(user) user.getUserId() }
 	public String getCheckInDate() { underlyingNode.getProperty("checkInDate", null) }
 	public String getCreateDate() { underlyingNode.getProperty("createDate", null) }
 	public String getNarrative() { underlyingNode.getProperty("narrative", null) }

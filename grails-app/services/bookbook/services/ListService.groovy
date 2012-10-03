@@ -87,9 +87,29 @@ class ListService {
 			HAVE_READ,
 			WANT_TO_READ
 		 */
+		
+		
+		
+		
 		User u = userService.findUsersByProperty("id", userId)
 		Book b = bookService.findBooksByProperty("id", bookId)
 		BookList bl = null;
+		
+		// validation - check to see if this book has already been added
+		IndexHits<Relationship> hits = listIndex.query(null,null,u.underlyingNode, b.underlyingNode)
+		while(hits.hasNext()) {
+			Relationship rel = hits.next()			
+			if(rel)
+			{
+				BookList hit = new BookList(rel)
+				if(hit.type.equals(relType)) {
+					hits.close()
+					log.debug "### book & list & user combination already exists!  sending error back to controller ###"
+					return false
+				}
+			}
+		}
+		hits.close()
 		
 		//establish new relationship
 		Transaction tx = graphDb.beginTx()

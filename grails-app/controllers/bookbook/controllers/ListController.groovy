@@ -57,8 +57,10 @@ class ListController {
 		def l = JSON.parse(params['jsondata'])
 		def userId = params['userId']
 		
-		listService.addListEntry(userId, l.bookId, l.listType, l.listTitle)
-		render "done"
+		if(false == listService.addListEntry(userId, l.bookId, l.listType, l.listTitle)) {
+			response.sendError(javax.servlet.http.HttpServletResponse.SC_CONFLICT) // 409
+		}
+		render ""
 	}
 	
 	def findListById = {

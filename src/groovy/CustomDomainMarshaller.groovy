@@ -38,7 +38,8 @@ public class CustomDomainMarshaller implements ObjectMarshaller<JSON> {
 		'model',
 		'transient',
 		'propertyAccessor',
-		'propertyEditorRegistry'];
+		'propertyEditorRegistry',
+		'index'];
 
     public boolean supports(Object object) {
 		def grailsApplication = new Book().domainClass.grailsApplication

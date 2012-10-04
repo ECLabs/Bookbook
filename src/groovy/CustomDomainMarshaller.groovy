@@ -1,4 +1,5 @@
 // CustomDomainMarshaller.groovy in src/groovy:
+import bookbook.domain.Book
 import grails.converters.JSON;
 import org.codehaus.groovy.grails.web.converters.ConverterUtil;
 import org.codehaus.groovy.grails.web.converters.exceptions.ConverterException;
@@ -12,10 +13,39 @@ import java.lang.reflect.Modifier;
 
 public class CustomDomainMarshaller implements ObjectMarshaller<JSON> {
 
-    static EXCLUDED = ['metaClass','class','id','version','underlyingNode','underlyingRel'];
+    static EXCLUDED = ['metaClass',
+		'class',
+		'id',
+		'version',
+		'underlyingNode',
+		'underlyingRel',
+		'attached',
+		'constraints',
+		'errors',
+		'errorCount',
+		'fieldError',
+		'fieldErrors',
+		'fieldErrorCount',
+		'globalError',
+		'globalErrorCount',
+		'messageCodesResolver',
+		'globalErrors',
+		'properties',
+		'transients',
+		'allErrors',
+		'embedded',
+		'nestedPath',
+		'model',
+		'transient',
+		'propertyAccessor',
+		'propertyEditorRegistry'];
 
     public boolean supports(Object object) {
-        return ConverterUtil.isConverterClass(object.getClass());
+		def grailsApplication = new Book().domainClass.grailsApplication
+		
+		// TODO: limit only to Domain classes
+
+        return object instanceof GroovyObject;
     }
 
     public void marshalObject(Object o, JSON json) throws ConverterException {
@@ -27,6 +57,7 @@ public class CustomDomainMarshaller implements ObjectMarshaller<JSON> {
             for (property in properties) {
                 String name = property.getName();
                 if(!EXCLUDED.contains(name)) {
+					println "name --> ${name}"
                     def readMethod = property.getReadMethod();
                     if (readMethod != null) {
                         def value = readMethod.invoke(o, (Object[]) null);

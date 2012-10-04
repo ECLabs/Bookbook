@@ -2,6 +2,7 @@ package bookbook.domain
 
 import org.neo4j.graphdb.Node
 import org.ocpsoft.pretty.time.PrettyTime
+import bookbook.domain.BookList
 
 /**
  * Instantiate with...
@@ -42,6 +43,7 @@ class Book {
 	CheckIn[] recentCheckIns // TODO
 	CheckIn[] friendsLastCheckIns // TODO
 	Opinion[] opinions // TODO
+	ArrayList<BookList> listsForUser
 	
 	Book(node) {
 		this.underlyingNode = node	
@@ -55,6 +57,7 @@ class Book {
 	public Long getCreatorUserId() { underlyingNode.getProperty("creatorUserId", null) }
 	public Long getBookId() { return underlyingNode.getProperty("id", null) == null ? 1234 : underlyingNode.getProperty("id", null) }
 	public String getPubType() { return underlyingNode.getProperty("pubType", null) }
+	public ArrayList<BookList>  getListsForUser() { return listsForUser }
 	public String getCreateDate() { 
 		PrettyTime p = new PrettyTime();
 		return p.format(new Date(underlyingNode.getProperty("createDate", null)))
@@ -90,9 +93,13 @@ class Book {
 	public void setBookId(Long value) {
 		if(value) underlyingNode.setProperty("id", value)
 	}
+	public void setListsForUser(ArrayList<BookList> listsForUser) {
+		this.listsForUser = listsForUser
+	}
 	
     static constraints = {
     }
+	
     
 	static transients = [ "underlyingNode", "recentCheckIns", "friendsLastCheckIns", "opinions" ]
 }

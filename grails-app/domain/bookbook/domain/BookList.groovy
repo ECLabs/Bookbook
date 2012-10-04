@@ -41,4 +41,5 @@ class BookList {
 	public void setType(String type) { underlyingRel.setProperty("type", type); }
 	public void setTitle(String title) { if(title) underlyingRel.setProperty("title", title); }
 	public void setCreateDate(String createDate) { if(createDate) underlyingRel.setProperty("createDate", createDate); }
+	
 }

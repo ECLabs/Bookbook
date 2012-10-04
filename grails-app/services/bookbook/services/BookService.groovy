@@ -26,6 +26,7 @@ import org.neo4j.kernel.EmbeddedGraphDatabase
 import org.apache.commons.logging.LogFactory
 
 import bookbook.domain.Book
+import bookbook.domain.BookList
 import bookbook.domain.CheckIn
 import bookbook.domain.GoogleBook
 import bookbook.domain.User
@@ -51,6 +52,7 @@ class BookService {
 	def CHECK_IN_KEY_COUNTER = "check_in_key_counter"
 	
 	def userService
+	def listService
 	
 	@PostConstruct
 	def initialize() {
@@ -185,7 +187,38 @@ class BookService {
 		}
 
 		log.debug "found ${allBooks.size()}"
+		if(property.equals('id'))
+			return allBooks[0]
+		
 		return allBooks
+	}
+	
+	/**
+	 * This method returns a book by ID
+	 * @param bookId
+	 * @return Book
+	 */
+	def findBook(bookId) {
+		return findBooksByProperty("id", bookId)
+	}
+	
+	/**
+	 * This method is used by the app on the Book Detail screen.  It helps determine
+	 * whether or not the user has added this book to any of their lists.
+	 * @param bookId
+	 * @param userId
+	 * @return Book
+	 */
+	def findBook(bookId, userId) {
+		def book = findBooksByProperty("id", bookId)
+		def user = userService.findUsersByProperty("id", userId)
+		
+		// get an array of all lists for this user and book
+		BookList[] lists = listService.findListsByBookAndUser(user, book)
+		
+		// add the list to the book
+		book.listsForUser = lists
+		return book
 	}
 	
 	def addBook(GoogleBook b) {

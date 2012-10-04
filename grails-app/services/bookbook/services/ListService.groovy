@@ -235,6 +235,16 @@ class ListService {
 		return allLists
 	}
 	
+	def findListsByBookAndUser(user, book) {
+		HashSet<BookList> lists = new HashSet<BookList>()
+		def rels = listIndex.query(null, null, user.underlyingNode, book.underlyingNode)
+		for(rel in rels) {
+			BookList bl = new BookList(rel)
+			lists.add(bl)
+		}
+		return lists
+	}
+	
 	def findBooksByListTypeForUser(userId, listType) {
 		def allLists = this.findListsByUserId(userId, listType)
 		def books = []

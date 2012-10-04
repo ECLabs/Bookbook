@@ -46,14 +46,15 @@ class BookController {
 		log.info "in findById(). Parameters are ${params.toString()}"
 		def results = ""
 
-		if(params.id)
-			results = bookService.findBooksByProperty("id", params.id)
-		
-		if(results instanceof ArrayList) {
-			results = results[0]
+		// userId and bookId were passed in - returns the book with the list objects included for 
+		if(params.id && params.userId) {
+			results = bookService.findBook(params.id, params.userId)
 		}
-		render results as JSON
+		else if(params.id) {
+			results = bookService.findBook(params.id)
+		}
 		
+		render results as JSON
 	}
 	
 	def find = {

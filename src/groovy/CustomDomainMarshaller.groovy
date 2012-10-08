@@ -58,7 +58,7 @@ public class CustomDomainMarshaller implements ObjectMarshaller<JSON> {
             for (property in properties) {
                 String name = property.getName();
                 if(!EXCLUDED.contains(name)) {
-					println "name --> ${name}"
+					// println "name --> ${name}"
                     def readMethod = property.getReadMethod();
                     if (readMethod != null) {
                         def value = readMethod.invoke(o, (Object[]) null);

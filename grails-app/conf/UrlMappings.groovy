@@ -75,6 +75,7 @@ class UrlMappings {
 			action = [POST:"update"]
 		}
 		
+		
 		/**
 		 * CHECK INS
 		 */
@@ -94,6 +95,8 @@ class UrlMappings {
 		"/api/book/checkIn/delete-all"(controller:"book") {
 			action = [GET:"removeAllCheckIns"]
 		}
+		
+		"/api/book/$id/opinion"(controller:"book") { action = [GET:"findOpinions", POST:"addOpinion"] }
 		
 		/**
 		 * LISTS (Likes, Read a while ago, Recently Read, Want to Read, custom)
@@ -133,6 +136,8 @@ class UrlMappings {
 			action = [POST:"addBookToList", DELETE:"removeBookFromList"]
 		}
 		*/
+		
+		
 		
 		"/$controller/$action?/$id?"{
 			constraints {

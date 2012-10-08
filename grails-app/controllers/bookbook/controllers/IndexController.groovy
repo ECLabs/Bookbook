@@ -14,22 +14,33 @@ class IndexController {
 	List users
 	List books
 	List bookLists = []
-	List listTypes = ['LIKE','HAVE_READ','WANT_TO_READ']
+	List listTypes = ['LIKE','HAVE_READ','WANT_TO_READ','HAVE_SKIMMED']
 	List checkIns = []
 	def graphDb
 	
     def index = { 
 		
-		users = userService.findAllUsers()	
+		users = userService.findAllUsers()
 		books = bookService.findAllBooks()
 		
 		for(Book b in books) {
 			checkIns.addAll(checkinService.findCheckInsByBookId(b.bookId))
-			bookLists.addAll(listService.findListsByBookId(b.bookId, ""))
 		}
 
 		//log.info ("**** shutting down DB ****")
 		//graphDb.shutdown()
+	}
+	
+	def user = {
+		users = userService.findAllUsers()
+	}
+	
+	def list = {
+		books = bookService.findAllBooks()
+		users = userService.findAllUsers()
+		for(Book b in books) {
+			bookLists.addAll(listService.findListsByBookId(b.bookId, ""))
+		}
 	}
 	
 	def dashboard = {

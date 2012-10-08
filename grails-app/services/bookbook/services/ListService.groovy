@@ -58,7 +58,8 @@ class ListService {
 		LISTS_REFERENCE,
 		LIKE,
 		HAVE_READ,
-		WANT_TO_READ
+		WANT_TO_READ,
+		HAVE_SKIMMED
 	}
 
 	def shutdown()
@@ -85,7 +86,8 @@ class ListService {
 		 	USER_LIST,
 			LIKE,
 			HAVE_READ,
-			WANT_TO_READ
+			WANT_TO_READ,
+			HAVE_SKIMMED
 		 */
 		
 		

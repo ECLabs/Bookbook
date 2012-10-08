@@ -56,133 +56,9 @@
         </style>
         <g:javascript library="jquery-1.5.1.min" />
         <g:javascript>
-        
-        	function addBook() {
-				var url = "api/book"
-        		$.ajax({
-        			url: url,
-        			type: "POST",
-        			statusCode: {
-    					409: function() {
-      						alert("Attempt to add a duplicate book - another with the same ISBN already exists.");
-    					},
-    					500: function() {
-      						alert("BookUp is having problems... see the application log for more details.");
-    					}
-  					},
-        			data: {jsondata : $('#jsondata_addbook').val() }
-        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload(); })
-        		.fail(function(jqXHR, textStatus) {
-				  alert( "Request failed: " + textStatus );
-				});;
-        	}
-        	
-        	function addUser() {
-				var url = "api/user"
-        		$.ajax({
-        			url: url,
-        			type: "POST",
-        			data: {jsondata : $('#jsondata_adduser').val() }
-        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
-        	}
-        	
-        	function updateBook() {
-				var url = "api/book"
-				var id = $('#books_updatebook').val()
-				url = url + "/update/" + id
-        		$.ajax({
-        			url: url,
-        			type: 'POST',
-        			data: {jsondata : $('#jsondata_updatebook').val() }
-        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
-        	}
-        	
-        	function getBook() {
-				var url = "api/book/"
-				var id = $('#books_updatebook').val()
-				url = url + id
-				/*
-        		$.ajax({
-        			url: url,
-        			type: 'GET'
-        		}).done(function(msg) { $('#jsondata_updatebook').val(msg); });
-        		*/
-        		$.getJSON(url, function(data) {
-        			$('#jsondata_updatebook').val(JSON.stringify(data));
-        		});
-        	}
-        	
-        	function getUser() {
-				var url = "api/user/userId-"
-				var id = $('#users_updateuser').val()
-				url = url + id
-
-        		$.getJSON(url, function(data) {
-        			$('#jsondata_updateuser').val(JSON.stringify(data));
-        		});
-        	}
-        	
-        	function updateUser() {
-				var url = "api/user"
-				var id = $('#users_updateuser').val()
-				url = url + "/update/userId-" + id
-        		$.ajax({
-        			url: url,
-        			type: 'POST',
-        			data: {jsondata : $('#jsondata_updateuser').val() }
-        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
-        	}
-        	
-        	function deleteUser() {
-				var url = "api/user/delete/"
-				var id = $('#users_deleteuser').val()
-				url = url + id
-        		$.ajax({
-        			url: url,
-        			type: 'GET'
-        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
-        	}
-        	
-        	function deleteBook() {
-				var url = "api/book/delete/"
-				var id = $('#books_deletebook').val()
-				url = url + id
-        		$.ajax({
-        			url: url,
-        			type: 'GET'
-        		}).done(function(msg) { alert("data saved.  Reloading page."); document.location.reload();});
-        	}
-        	
-        	function createCheckInBook() {
-				var url = "api/book";
-				var bookId = $('#books_createcheckin').val();
-				var userId = $('#users_createcheckin').val();
-				var chapterOrSection = $('#chapterOrSection').val();
-				var narrative = $('#narrative').val();
-				url = url + "/" + bookId + "/checkIn";
-        		$.ajax({
-        			url: url,
-        			type: 'POST',
-        			data: {jsondata : "{'userId':"+userId+",'narrative':'"+narrative+"','chapterOrSection':'"+chapterOrSection+"','venue':null,'latitude':null,'longitude':null}" }
-        		}).done(function(msg) { alert(JSON.stringify(msg)); document.location.reload(); });
-        	}
-        	
-        	function createCheckInUser() {
-				var url = "api/user";
-				var bookId = $('#books_createcheckin').val();
-				var userId = $('#users_createcheckin').val();
-				var chapterOrSection = $('#chapterOrSection').val();
-				var narrative = $('#narrative').val();
-				url = url + "/" + userId + "/checkIn";
-        		$.ajax({
-        			url: url,
-        			type: 'POST',
-        			data: {jsondata : "{'bookId':"+bookId+",'narrative':'"+narrative+"','chapterOrSection':'"+chapterOrSection+"','venue':null,'latitude':null,'longitude':null}" }
-        		}).done(function(msg) { alert(JSON.stringify(msg)); document.location.reload(); });
-        	}
         	
         	function addToList() {
-				var url = "api/list/";
+				var url = "/Bookbook/api/list/";
 				var bookId = $('#books').val();
 				var userId = $('#users').val();
 				var listType = $('#listTypes').val();
@@ -197,7 +73,7 @@
         	}
         	
         	function deleteListEntry() {
-				var url = "api/list/delete/bookListId-"
+				var url = "/Bookbook/api/list/delete/bookListId-"
 				var id = $('#lists_delete').val()
 				url = url + id
         		$.ajax({

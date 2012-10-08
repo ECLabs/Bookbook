@@ -116,7 +116,7 @@ body {
           	  			<span class="label label-success">G</span>
           	  		</g:if>
               		<g:else>
-              			<span class="label label-important">${bookInstance.bookId}</span>
+              			<span class="label label-important" id="bookIdNumber-${bookInstance.bookId}">${bookInstance.bookId}</span>
               		</g:else>
           	  </td>   
           	  <td class="firstRow">
@@ -139,14 +139,15 @@ body {
               		${fieldValue(bean: bookInstance, field: "createDate")}
               	</g:else>
               </td>    
-              <td width="100">
+              <td width="120">
               	<g:if test="${bookInstance.bookId == null}">
               		<a id="jamil" class="btn btn-success" style="width:78px" href="#" onclick="addGoogleBook(this)">Add Book</a>
               		<span class="jsonForAdd" style="display:none">${jsonBookArray[i]}</span>
               	</g:if>
               	<g:else>
-              		<a id="jamil" class="btn btn-info" style="width:78px" href="#" onclick="showEditWindow($('#book-${bookInstance.bookId}'));">Update Book</a>
+              		<a id="jamil" class="btn btn-info" href="#" onclick="showEditWindow($('#book-${bookInstance.bookId}'));">Update</a>
               	</g:else>
+              	<a id="" class="btn btn-warning" href="#" onclick="launchAddCommentModal($('#bookIdNumber-${bookInstance.bookId}').text());"><i class="icon-comment icon-white"></i></a>
               </td>
           </tr>
       </g:each>
@@ -198,6 +199,29 @@ body {
     <a href="#" class="btn btn-primary" id="saveBtn2" onclick="$('#spinner2').show(); addBook($('#jsonCode2').val())">Save</a> </div>
   </div>
   
+  <div class="modal hide fade" id="myModal3">
+    <div class="modal-header">
+      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+      <h3><i class="icon-book"></i> <span id="popupTitle3">Default</span></h3>
+    </div>
+    <div class="modal-body">
+      <p>
+      
+      <div class="alert hide" id="main-alert3">
+        <button type="button" class="close" data-dismiss="alert">×</button>
+        <span>Edit the JSON below and save.</span>
+      </div>
+      
+      <h4>Type your JSON below</h4>
+      <textarea rows="10" id="jsonCode3" style="width:520px; background-color:whiteSmoke"></textarea>
+      <input type="hidden" id="bookId3"/>
+      </p>
+    </div>
+    <div class="modal-footer"> <span id="spinner3"><img src="${resource(dir:'images',file:'spinner_popup.gif')}"/> Saving...</span>
+    <a href="#" class="btn" onclick="$('#myModal3').modal('hide');">Close</a>
+    <a href="#" class="btn btn-primary" id="saveBtn3" onclick="$('#spinner3').show(); addComment($('#jsonCode3').val(), $('#bookId3').val())">Save</a> </div>
+  </div>
+  
 
   <div  style="text-align:center">
   	<span class="label">Displaying ${books.size()} results</span>
@@ -218,6 +242,7 @@ body {
 	var g_refreshPage = false;
 	$('#spinner').hide();
 	$('#spinner2').hide();
+	$('#spinner3').hide();
 	
 	$('#myModal').on('hidden', function () {
 	  if(g_refreshPage) {
@@ -227,6 +252,13 @@ body {
 	})
 	
 	$('#myModal2').on('hidden', function () {
+	  if(g_refreshPage) {
+	  	
+	  	document.location.reload();
+	  }
+	})
+	
+	$('#myModal3').on('hidden', function () {
 	  if(g_refreshPage) {
 	  	
 	  	document.location.reload();
@@ -331,8 +363,38 @@ body {
 			$('#main-alert2 span').html(msg);
 			$('#main-alert2').removeClass('alert-success').addClass('alert-error');
 		}).always(function() {
-			$('#spinner').hide();
+			$('#spinner2').hide();
 			$('#main-alert2').show().delay(3000).fadeOut('slow');
+		});
+    }	
+    
+    function addComment(json, bookId) {
+		var url = "/Bookbook/api/book/" + bookId + "/opinion";
+    	$.ajax({
+    			url: url,
+    			type: "POST",
+    			statusCode: {
+					500: function() {
+  						var msg = "BookUp is having problems... see the application log for more details.";
+  						$('#main-alert3 span').html(msg);
+   						$('#main-alert3').removeClass('alert-success').addClass('alert-error');
+   						$('#spinner3').hide();
+						$('#main-alert3').show().delay(3000).fadeOut('slow');
+					}
+				},
+    			data: {jsondata : json }
+    	}).done(function(msg) { 
+    		$('#main-alert3 span').html('Comment add successful!');
+   			$('#main-alert3').removeClass('alert-error').addClass('alert-success');
+   			g_refreshPage = true;
+   			$('#myModal3').modal('hide'); // hide the window after a delete 
+   		}).fail(function(jqXHR, textStatus) {
+		 	var msg = "BookUp is having problems... see the application log for more details.";
+			$('#main-alert3 span').html(msg);
+			$('#main-alert3').removeClass('alert-success').addClass('alert-error');
+		}).always(function() {
+			$('#spinner3').hide();
+			$('#main-alert3').show().delay(3000).fadeOut('slow');
 		});
     }	
 		
@@ -341,6 +403,14 @@ body {
 		$('#popupTitle2').text('Add a book');
 		var json = '({"author":"","description":"","isbn10":"","pubType":"","smallThumbnailUrl":"","source":"","thumbnailUrl":"","title":"","creatorUserId":""})';
 		$('#jsonCode2').val(JSON.stringify(eval(json), undefined, 2));
+	}	
+	
+	function launchAddCommentModal(bookInfo) {
+		$('#myModal3').modal('show');
+		$('#popupTitle3').text('Add a comment');
+		var json = '({"text":"","bookId":bookInfo,"userId":""})';
+		$('#jsonCode3').val(JSON.stringify(eval(json), undefined, 2));
+		$('#bookId3').val(bookInfo);
 	}	
 	
 	function addGoogleBook(addBtn) {

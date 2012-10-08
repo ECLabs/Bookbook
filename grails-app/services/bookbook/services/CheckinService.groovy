@@ -17,17 +17,7 @@ import org.neo4j.graphdb.Direction
 
 class CheckinService {
 	
-	// Google Books API Oauth2
 	static transactional = false
-	def NETWORK_NAME = "Google"
-	def CLIENT_ID = "690667165235.apps.googleusercontent.com"
-	def CLIENT_SECRET = "SnAOp_UYXQtrJECyYJJt8ET7"
-	def REDIRECT_URI = "http://localhost:8080/TimeWorks/googlebooks/getBooks"
-	def SCOPE = "https://www.googleapis.com/auth/books"
-	def RESPONSE_TYPE = "code"
-	def AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}&response_type=${RESPONSE_TYPE}";
-	def API_KEY = "AIzaSyCmCwkxWuUuSSOSneMPBA3vPF2UWNfwr_E"
-	def PROTECTED_RESOURCE_URL = "https://www.googleapis.com/";
 	
 	//neo4j
 	def graphDb
@@ -39,6 +29,7 @@ class CheckinService {
 	
 	def userService
 	def bookService
+	def opinionService
 	
 	@PostConstruct
 	def initialize() {
@@ -51,7 +42,6 @@ class CheckinService {
 	@PreDestroy
 	def cleanUp() {
 		log.debug "############### cleanUp()  - Shutting down graphDb."
-		//graphDb.shutdown();
 	}
 	
 	def enum RelTypes implements RelationshipType
@@ -62,28 +52,6 @@ class CheckinService {
 		BOOK,
 		CHECK_IN
 	}
-
-	def shutdown()
-	{
-		graphDb.shutdown();
-	}
-	def registerShutdownHook()
-	{
-		// Registers a shutdown hook for the Neo4j and index service instances
-		// so that it shuts down nicely when the VM exits (even if you
-		// "Ctrl-C" the running example before it's completed)
-		Runtime.getRuntime().addShutdownHook( new Thread()
-		{
-			@Override
-			public void run()	{
-				shutdown();
-			}
-		} );
-	}
-
-    def serviceMethod() {
-
-    }
 	
 	def addCheckin(data, bookId, userId) {
 		log.debug "in addCbeckin()"
@@ -126,6 +94,8 @@ class CheckinService {
 			
 			checkInIndex.add(rel2, "userId", u.userId)
 			checkInIndex.add(rel1, "bookId", b.bookId)
+			
+			opinionService.addOpinion(data.narrative, c, b, u)
 			
 			log.debug "Check-in date: ${c.checkInDate.toString()}"
 			log.debug "SUCCESS -----> check-in created successfully!!"

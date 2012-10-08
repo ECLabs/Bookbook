@@ -29,6 +29,7 @@ class CheckIn {
 	Node underlyingNode
 	Book book
 	User user
+	Opinion opinion
 	RelationshipIndex index
 	
 	def enum RelTypes implements RelationshipType
@@ -38,7 +39,10 @@ class CheckIn {
 		BOOKS_REFERENCE,
 		BOOK,
 		CHECK_IN,
-		CHECKINS_REFERENCE
+		OPINION_ON,
+		OPINION_BY,
+		CHECK_IN_OPINION,
+		OPINION_REFERENCE
 	}
 	
     static constraints = { }
@@ -57,16 +61,16 @@ class CheckIn {
 		
 		// get the related user
 		def userRels = cNode.getRelationships(RelTypes.CHECK_IN, Direction.INCOMING)
-
-		def counter = 0
-		while(userRels.hasNext()) {
-			log.debug "associating user ****"
-			user = new User(userRels.next().getStartNode())
-			log.debug "User is [${user.userId}] ${counter}"
-			counter++
-			if(user.userId)
-				break
+		if(userRels.hasNext()) {
+			user = new User(userRels.next().getStartNode())		
 		}
+		
+		// get the related opinion
+		def oRels = cNode.getRelationships(RelTypes.CHECK_IN_OPINION, Direction.INCOMING)
+		if(oRels.hasNext()) {
+			opinion = new Opinion(oRels.next().getStartNode())
+		}
+		
 	}
 	
 	// Constructor
@@ -91,6 +95,7 @@ class CheckIn {
 	public Node getUnderlyingNode() { return underlyingNode }
 	public Book getBook() { return book }
 	public User getUser() { return user }
+	public Opinion getOpinion() { return opinion }
 	
 	public void setCheckInId(Long checkInId) { 
 		if(checkInId) 
@@ -113,6 +118,7 @@ class CheckIn {
 			this.user = user
 		}
 	}
+	public void setOpinion(Opinion opinion) { this.opinion = opinion }
 
 	@Override
 	public int hashCode() {

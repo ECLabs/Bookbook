@@ -4,15 +4,20 @@ import java.text.Normalizer.Form;
 
 import bookbook.domain.GoogleBook
 import bookbook.domain.Book
+import bookbook.domain.Opinion
+import bookbook.domain.User
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import javax.servlet.http.HttpServletRequest
 
 class BookController {
 
-	def GOOGLE_BOOKS_MAX_RESULTS_PER_SEARCH = 10
 	def bookService
+	def userService
 	def checkinService
+	def opinionService
+	
+	def GOOGLE_BOOKS_MAX_RESULTS_PER_SEARCH = 10
 	def queryReturn
 	def youSearchedFor
 	def jsonBookArray = []
@@ -30,6 +35,11 @@ class BookController {
 		else {
 			books = bookService.findAllBooks()
 		}
+		
+	}
+	
+	def comments = {
+		log.info "in books(). Parameters are ${params.toString()}"
 		
 	}
 	
@@ -185,6 +195,27 @@ class BookController {
 		}
 		
 		return combined.values()
+	}
+	
+	def addOpinion = {
+		log.info "in addOpinion(). Parameters are ${params.toString()}"
+		
+		def jsonOpinion = JSON.parse(params.jsondata)
+		User user = userService.findUsersByProperty("id", Long.valueOf(jsonOpinion.userId))
+		Book book = bookService.findBook(params.id)
+		log.info "comment text is -------->" + jsonOpinion.text
+		Opinion opinion = opinionService.addOpinion(jsonOpinion.text, book, user)
+		if(opinion == false) {
+			log.error("Unable to add comment")
+			response.sendError(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR) // 500
+		}
+		else {
+			render opinion as JSON
+		}
+	}
+	
+	def findOpinions = {
+		render opinionService.findByBookId(params.id) as JSON
 	}
 	
 	def copyProperties(def source, def target){

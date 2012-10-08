@@ -25,18 +25,18 @@
             margin-bottom:10px;
         }
         .homePagePanel .panelBody {
-            background: url(images/leftnav_midstretch.png) repeat-y top;
+            background: url(/Bookbook/images/leftnav_midstretch.png) repeat-y top;
             margin:0px;
             padding:15px;
         }
         .homePagePanel .panelBtm {
-            background: url(images/leftnav_btm.png) no-repeat top;
+            background: url(/Bookbook/images/leftnav_btm.png) no-repeat top;
             height:20px;
             margin:0px;
         }
 
         .homePagePanel .panelTop {
-            background: url(images/leftnav_top.png) no-repeat top;
+            background: url(/Bookbook/images/leftnav_top.png) no-repeat top;
             height:11px;
             margin:0px;
         }

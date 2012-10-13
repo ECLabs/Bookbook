@@ -1,19 +1,22 @@
 package bookbook.services
 
-import bookbook.domain.Book
-import bookbook.domain.CheckIn
-import bookbook.domain.GoogleBook;
-import bookbook.domain.User
+import javax.annotation.PostConstruct
+import javax.annotation.PreDestroy
 
-import javax.annotation.PostConstruct;
-import javax.annotation.PreDestroy;
-
-import org.neo4j.graphdb.Node;
+import org.neo4j.graphdb.Direction
+import org.neo4j.graphdb.Node
+import org.neo4j.graphdb.Path
 import org.neo4j.graphdb.Relationship
-import org.neo4j.graphdb.RelationshipType;
+import org.neo4j.graphdb.RelationshipType
 import org.neo4j.graphdb.Transaction
 import org.neo4j.graphdb.index.RelationshipIndex
-import org.neo4j.graphdb.Direction
+import org.neo4j.graphdb.traversal.TraversalDescription
+import org.neo4j.helpers.collection.IterableWrapper
+import org.neo4j.kernel.Traversal
+
+import bookbook.domain.Book
+import bookbook.domain.CheckIn
+import bookbook.domain.User
 
 class CheckinService {
 	
@@ -50,16 +53,21 @@ class CheckinService {
 		USER,
 		BOOKS_REFERENCE,
 		BOOK,
-		CHECK_IN
+		CHECK_IN, // remove this one once all are converted to the new linked list format
+		CHECK_INS,
+		NEXT_CHECKIN_FOR_BOOK,
+		NEXT_CHECKIN_FOR_USER,
+		CHECKINS_REFERENCE
 	}
 	
 	def addCheckin(data, bookId, userId) {
 		log.debug "in addCbeckin()"
 		
-		CheckIn c = null
+		CheckIn newCheckin = null
 		Transaction tx = graphDb.beginTx()
 		try {
 			
+			// get the book and user objects
 			User u = userService.findUsersByProperty("id", userId)
 			Book b = bookService.findBooksByProperty("id", bookId)
 			
@@ -69,10 +77,10 @@ class CheckinService {
 			if(b instanceof java.util.List && b.size() > 0) {
 				b = b.first
 			}
-						
+					
+			// create the new checkin node
 			CheckinFactory factory = new CheckinFactory(graphDb, checkInIndex)
-			
-			c = factory.createCheckin().with {
+			newCheckin = factory.createCheckin().with {
 				checkInDate = new Date().toString()
 				createDate = new Date().toString()
 				narrative = data.narrative
@@ -81,57 +89,99 @@ class CheckinService {
 				latitude = data.latitude
 				longitude = data.longitude
 				index = this.checkInIndex
-				book = b
+				//book = b
 				user = u
 				return it
 			}
 			
-			log.debug "about to create 1st relationship"
-			Relationship rel1 = c.underlyingNode.createRelationshipTo(b.underlyingNode, RelTypes.CHECK_IN)
+			// get the current associated root checkin
+			CheckIn originalCheckin = null;
+			def rels = b.underlyingNode.getRelationships(RelTypes.CHECK_INS, Direction.OUTGOING)
+			if(rels.hasNext()) {
+				
+				// there's an existing checkin, so we need to subordinate it to the new one
+				def existingCheckinRel = rels.next();
+				originalCheckin = new CheckIn(existingCheckinRel.getEndNode())
+				
+				// delete old relationship to the book
+				existingCheckinRel.delete()
+				
+				// create relationship from the new checkin to the orig one with reltype = NEXT_CHECKIN_FOR_BOOK
+				log.debug "about to create 1st relationship"
+				Relationship rel0 = newCheckin.underlyingNode.createRelationshipTo(originalCheckin.underlyingNode, RelTypes.NEXT_CHECKIN_FOR_BOOK)
+			}
+
+			// create relationship from book to new check node
 			log.debug "about to create 2nd relationship"
-			Relationship rel2 = u.underlyingNode.createRelationshipTo(c.underlyingNode, RelTypes.CHECK_IN)
-			log.debug "after creating 2nd relationship"
+			Relationship rel1 = b.underlyingNode.createRelationshipTo(newCheckin.underlyingNode, RelTypes.CHECK_INS)
 			
+			// create relationship from user to the new checkin
+			log.debug "about to create 3rd relationship"
+			Relationship rel2 = u.underlyingNode.createRelationshipTo(newCheckin.underlyingNode, RelTypes.CHECK_IN)
+			log.debug "after creating 3rd relationship"
+
 			checkInIndex.add(rel2, "userId", u.userId)
 			checkInIndex.add(rel1, "bookId", b.bookId)
 			
-			opinionService.addOpinion(data.narrative, c, b, u)
+			newCheckin.opinion = opinionService.addOpinion(data.narrative, b, u, newCheckin)
 			
-			log.debug "Check-in date: ${c.checkInDate.toString()}"
+			log.debug "Check-in date: ${newCheckin.checkInDate.toString()}"
 			log.debug "SUCCESS -----> check-in created successfully!!"
 			tx.success()
 		}
 		catch(e) {
 			tx.failure()
 			log.error e.toString()
+			log.error e.printStackTrace()
 			return false
 		}
 		finally {
 			tx.finish()
 		}
-		return c
+		return newCheckin
 	}
 	
 	def findCheckInsByBookId(bookId) {
 		log.debug "<< Looking for check-ins for bookId:${bookId}"
 		HashSet<CheckIn> allCheckIns = new HashSet<CheckIn>();
 		def b = bookService.findBooksByProperty("id", bookId)
-		def rels = checkInIndex.query("bookId", bookId) // 4th param is end node of rel
+
+		// get the first checkin and add to list
+		CheckIn firstCheckin = null;
+		def rels = b.underlyingNode.getRelationships(RelTypes.CHECK_INS, Direction.OUTGOING)
+		if(!rels.hasNext()) {
+			return [];
+		}	
+		firstCheckin = new CheckIn(rels.next().getEndNode(), (Book) b)
+		allCheckIns.add(firstCheckin)	
+				
 		
-		for(rel in rels) {
-			CheckIn ci = new CheckIn(rel.getStartNode())
-			allCheckIns.add(ci)
+		// create traverser and all all to the hashset	
+		TraversalDescription traversal = Traversal.description().
+		depthFirst().
+		relationships( RelTypes.NEXT_CHECKIN_FOR_BOOK);
+		
+		Iterable<CheckIn> checkinIterator = new IterableWrapper<CheckIn, Path>(
+                traversal.traverse( firstCheckin.underlyingNode ) ) {
+				
+            @Override
+			protected CheckIn underlyingObjectToObject( Path path )
+            {
+				def rels2 = path.startNode().getRelationships(RelTypes.CHECK_INS, Direction.INCOMING)
+				if(rels2.hasNext()) {
+					return new CheckIn( path.endNode(),  new Book(rels2.next().getStartNode()));
+				}
+                return new CheckIn( path.endNode() );
+            }
+        };
+	
+		Iterator<CheckIn> it = checkinIterator.iterator()
+		while(it.hasNext()) {
+			allCheckIns.add(it.next())
 		}
-		log.debug "found [${allCheckIns.size()}] check-ins for book [${b.title}]"
-		
-		def rels2 = b.underlyingNode.getRelationships(RelTypes.CHECK_IN, Direction.INCOMING)
-		for (rel2 in rels2) {
-			CheckIn ci = new CheckIn(rel2.getStartNode())
-			allCheckIns.add(ci) // .equals() doesn't allow duplicates
-		}
-		log.debug "found [${allCheckIns.size()}] check-ins in graph for book with bookId [${b.title}]"
-		
+			
 		return allCheckIns
+		
 	}
 	
 	def findCheckInsByUserId(userId) {

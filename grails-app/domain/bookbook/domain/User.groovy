@@ -40,29 +40,29 @@ class User {
 	}
 	
 	public Long getUserId() { 
-		underlyingNode.getProperty("id", null) 
+		return underlyingNode.getProperty("id", null) 
 	}
-	public String getFirstName() { underlyingNode.getProperty("firstName", null) }
-	public String getLastName() { underlyingNode.getProperty("lastName", null) }
-	public String getMiddleName() { underlyingNode.getProperty("middleName", null) }
-	public String getFullName() { underlyingNode.getProperty("fullName", null) }
-	public String getUserName() { underlyingNode.getProperty("userName", null) }
-	public String getEmail() { underlyingNode.getProperty("email", null) }
-	public String getPassword() { underlyingNode.getProperty("password", null) }
-	public String getPhotoUrl() { underlyingNode.getProperty("photoUrl", null) }
-	public String getCreateDate() { underlyingNode.getProperty("createDate", null) }
-	public String getEndDate() { underlyingNode.getProperty("endDate", null) }
-	public String getUpdateDate() { underlyingNode.getProperty("upateDate", null) }
-	public String getLastLoginDate() { underlyingNode.getProperty("lastLoginDate", null) }
-	public String getUserTypeCode() { underlyingNode.getProperty("userTypeCode", null) }
-	public String getLocation() { underlyingNode.getProperty("location", null) }
-	public String getAboutMe() { underlyingNode.getProperty("aboutMe", null) }
-	public String getActivationMethod() { underlyingNode.getProperty("activationMethod", null) }
-	public String getNumberOfFollowers() { underlyingNode.getProperty("numberOfFollowers", null) }
-	public String getNumberFollowing() { underlyingNode.getProperty("numberFollowing", null) }
-	public String getFacebookId() { underlyingNode.getProperty("facebookId", null) }
-	public String getFacebookUpdateTime() { underlyingNode.getProperty("facebookUpdateTime", null) }
-	public String getGender() { underlyingNode.getProperty("gender", null) }
+	public String getFirstName() { return underlyingNode.getProperty("firstName", null) }
+	public String getLastName() { return underlyingNode.getProperty("lastName", null) }
+	public String getMiddleName() { return underlyingNode.getProperty("middleName", null) }
+	public String getFullName() { return underlyingNode.getProperty("fullName", null) }
+	public String getUserName() { return underlyingNode.getProperty("userName", null) }
+	public String getEmail() { return underlyingNode.getProperty("email", null) }
+	public String getPassword() { return underlyingNode.getProperty("password", null) }
+	public String getPhotoUrl() { return underlyingNode.getProperty("photoUrl", null) }
+	public String getCreateDate() { return underlyingNode.getProperty("createDate", null) }
+	public String getEndDate() { return underlyingNode.getProperty("endDate", null) }
+	public String getUpdateDate() { return underlyingNode.getProperty("upateDate", null) }
+	public String getLastLoginDate() { return underlyingNode.getProperty("lastLoginDate", null) }
+	public String getUserTypeCode() { return underlyingNode.getProperty("userTypeCode", null) }
+	public String getLocation() { return underlyingNode.getProperty("location", null) }
+	public String getAboutMe() { return underlyingNode.getProperty("aboutMe", null) }
+	public String getActivationMethod() { return underlyingNode.getProperty("activationMethod", null) }
+	public String getNumberOfFollowers() { return underlyingNode.getProperty("numberOfFollowers", null) }
+	public String getNumberFollowing() { return underlyingNode.getProperty("numberFollowing", null) }
+	public String getFacebookId() { return underlyingNode.getProperty("facebookId", null) }
+	public String getFacebookUpdateTime() { return underlyingNode.getProperty("facebookUpdateTime", null) }
+	public String getGender() { return underlyingNode.getProperty("gender", null) }
 	
 	public void setUserId(Long value) { 
 		if(value) 

@@ -19,7 +19,7 @@ class BookController {
 	
 	def GOOGLE_BOOKS_MAX_RESULTS_PER_SEARCH = 10
 	def queryReturn
-	def youSearchedFor
+	def titleForComments
 	def jsonBookArray = []
 	def graphDb
 	
@@ -39,7 +39,18 @@ class BookController {
 	}
 	
 	def comments = {
-		log.info "in books(). Parameters are ${params.toString()}"
+		log.info "in comments(). Parameters are ${params.toString()}"
+		queryReturn = params.bookId
+		if(params.bookId) {
+			comments = opinionService.findByBookId(params.bookId)
+			for(c in comments) {
+				jsonBookArray.push(c as JSON)
+			}
+
+		}
+		else {
+			comments = opinionService.findAllOpinions()
+		}
 		
 	}
 	
@@ -121,6 +132,7 @@ class BookController {
 	}
 	
 	def establishCheckIn = {
+		log.info "in establishCheckIn(). Parameters are ${params.toString()}"
 		def jsonCheckIn = JSON.parse(params.jsondata)
 		def returnVal = checkinService.addCheckin(jsonCheckIn, params.bookId, jsonCheckIn.userId)
 		if(returnVal == false) {
@@ -204,7 +216,7 @@ class BookController {
 		User user = userService.findUsersByProperty("id", Long.valueOf(jsonOpinion.userId))
 		Book book = bookService.findBook(params.id)
 		log.info "comment text is -------->" + jsonOpinion.text
-		Opinion opinion = opinionService.addOpinion(jsonOpinion.text, book, user)
+		Opinion opinion = opinionService.addOpinion(jsonOpinion.text, book, user, null)
 		if(opinion == false) {
 			log.error("Unable to add comment")
 			response.sendError(javax.servlet.http.HttpServletResponse.SC_INTERNAL_SERVER_ERROR) // 500

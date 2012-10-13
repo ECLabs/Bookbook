@@ -59,9 +59,8 @@ body {
   <div class="row-fluid">
     <ul class="nav nav-tabs">
       <li><a href="/Bookbook/index/dashboard">Dashboard</a></li>
-      <li class="active"><a href="/Bookbook/book/books">Books</a></li>
-      <li><a href="/Bookbook/book/comments">Comments</a></li>
-<!--      <li><a href="#">Book Lists</a></li>
+      <li><a href="/Bookbook/book/books">Books</a></li>
+      <li class="active"><a href="/Bookbook/book/comments">Comments</a></li> <!-- 
       <li><a href="#">Users</a></li>
       <li><a href="#">Check-Ins</a></li>
       <li><a href="#">Followers</a></li>
@@ -73,7 +72,7 @@ body {
     </ul>
   </div>
   <div class="row-fluid">
-    <h1 class="pull-left">Books</h1>
+    <h1 class="pull-left">Comments</h1>
     <div class="alert pull-left hide" id="the-alert" style="margin-left:10px;">
         <button type="button" class="close" data-dismiss="alert">×</button>
         <span></span>
@@ -82,13 +81,13 @@ body {
     
     <div class="btn-toolbar" style="padding-bottom:30px; margin-top:0;">
       <!-- <div class="btn-group pull-right"> <a class="btn btn-info dropdown-toggle" data-toggle="dropdown" href="#"> Re-index </a> </div> -->
-      <div class="btn-group  pull-right" style="margin-right:5px;"> <a class="btn" href="#" onclick="launchAddBookModal()"> Create a Book</a>
+      <div class="btn-group  pull-right" style="margin-right:5px;"> <a class="btn" href="#" onclick="return false; launchAddCommentModal()"> Create a Comment</a>
       </div>
        
-      <g:form action="books" controller="book" method="get" style="clear:none;margin:0;padding:0;">
+      <g:form action="comments" controller="book" method="get" style="clear:none;margin:0;padding:0;">
       <div class="pull-right" style="margin-right:10px"> 
       	<span class="input-append">
-        	<input class="span2" name="title" id="appendedInputButton" size="16" type="text" style="width:200px" value="${queryReturn}"><button class="btn" type="submit"><i class="icon-search"></i> Search</button><button class="btn" type="button" onclick="window.location='/Bookbook/book/books'">Reset</button>
+        	<input class="span2" name="bookId" id="appendedInputButton" size="16" type="text" style="width:200px" placeholder="Enter book ID" value="${queryReturn}"><button class="btn" type="submit"><i class="icon-search"></i> Search</button><button class="btn" type="button" onclick="window.location='/Bookbook/book/comments'">Reset</button>
         </span> 
       </div>
       </g:form>
@@ -102,53 +101,34 @@ body {
     <table class="table table-striped">
       <tr>
       	<th>ID</th>
-        <th>Title</th>
-        <th>Author</th>
-        <th>Description</th>
-        <th>Thumb</th>
-        <th>ISBN</th>
+      	<th>UserPic</th>
+        <th>User</th>
+        <th>Book</th>
+        <th>Text</th>
         <th>Created</th>
         <th>Actions</th>
       </tr>
-      <g:each in="${books}" status="i" var="bookInstance">
+      <g:each in="${comments}" status="i" var="commentInstance">
           <tr>  
           	  <td> 
-          	  		<g:if test="${bookInstance.bookId == null}">
-          	  			<span class="label label-success">G</span>
-          	  		</g:if>
-              		<g:else>
-              			<span class="label label-important" id="bookIdNumber-${bookInstance.bookId}">${bookInstance.bookId}</span>
-              		</g:else>
+              		<span class="label label-important" id="comment-${commentInstance.opinionId}">${commentInstance.opinionId}</span>
           	  </td>   
+          	  <td width="60"><img src="${fieldValue(bean: commentInstance, field: "user.photoUrl")}" width="40" align="top" /></td>
           	  <td class="firstRow">
-          	  		<!-- <i class="icon-book"></i>  --> 
-          	  		<a href="/Bookbook/api/book/${bookInstance.bookId}" id="book-${bookInstance.bookId}" onclick="showEditWindow(this); return false;">
-          	  		${fieldValue(bean: bookInstance, field: "title")}
-          	  		</a> 
           	  		
-          	  </td>          	
-              <td>${fieldValue(bean: bookInstance, field: "author")}</td>
-              <td width="300"><g:truncate maxlength="200">${fieldValue(bean: bookInstance, field: "description")}</g:truncate></td>
-              <td><img src="${bookInstance.smallThumbnailUrl}"/></td>
-              <td>${fieldValue(bean: bookInstance, field: "isbn10")}</td>
-              
+          	  		<a href="/Bookbook/api/user/userId-${commentInstance.user.userId}" id="user-${commentInstance.user.userId}" onclick="showEditWindow(this); return false;">
+          	  		${fieldValue(bean: commentInstance, field: "user.userName")} (${commentInstance.user.userId})
+          	  		</a>   		
+          	  </td>        	
+              <td>
+  	  				<a href="/Bookbook/api/book/${commentInstance.book.bookId}" id="book-${commentInstance.book.bookId}" onclick="showEditWindow(this); return false;">
+                      		${fieldValue(bean: commentInstance, field: "book.title")} (${commentInstance.book.bookId})
+                    </td>
+              		</a>
+              <td width="500"><g:truncate maxlength="200">${fieldValue(bean: commentInstance, field: "text")}</g:truncate></td>
+              <td width="120">${commentInstance.createDate}</td>
               <td width="100">
-              	<g:if test="${bookInstance.bookId == null}">
-              		&nbsp;
-              	</g:if>
-              	<g:else>
-              		${fieldValue(bean: bookInstance, field: "createDate")}
-              	</g:else>
-              </td>    
-              <td width="120">
-              	<g:if test="${bookInstance.bookId == null}">
-              		<a id="jamil" class="btn btn-success" style="width:78px" href="#" onclick="addGoogleBook(this)">Add Book</a>
-              		<span class="jsonForAdd" style="display:none">${jsonBookArray[i]}</span>
-              	</g:if>
-              	<g:else>
-              		<a id="jamil" class="btn btn-info" href="#" onclick="showEditWindow($('#book-${bookInstance.bookId}'));">Update</a>
-              	</g:else>
-              	<a id="" class="btn btn-warning" href="#" onclick="launchAddCommentModal($('#bookIdNumber-${bookInstance.bookId}').text());"><i class="icon-comment icon-white"></i></a>
+              		<a id="jamil" class="btn btn-info" style="width:78px" href="#" onclick="return false; showEditWindow($('#comment-${commentInstance.opinionId}'));">Update</a>
               </td>
           </tr>
       </g:each>
@@ -200,32 +180,9 @@ body {
     <a href="#" class="btn btn-primary" id="saveBtn2" onclick="$('#spinner2').show(); addBook($('#jsonCode2').val())">Save</a> </div>
   </div>
   
-  <div class="modal hide fade" id="myModal3">
-    <div class="modal-header">
-      <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-      <h3><i class="icon-book"></i> <span id="popupTitle3">Default</span></h3>
-    </div>
-    <div class="modal-body">
-      <p>
-      
-      <div class="alert hide" id="main-alert3">
-        <button type="button" class="close" data-dismiss="alert">×</button>
-        <span>Edit the JSON below and save.</span>
-      </div>
-      
-      <h4>Type your JSON below</h4>
-      <textarea rows="10" id="jsonCode3" style="width:520px; background-color:whiteSmoke"></textarea>
-      <input type="hidden" id="bookId3"/>
-      </p>
-    </div>
-    <div class="modal-footer"> <span id="spinner3"><img src="${resource(dir:'images',file:'spinner_popup.gif')}"/> Saving...</span>
-    <a href="#" class="btn" onclick="$('#myModal3').modal('hide');">Close</a>
-    <a href="#" class="btn btn-primary" id="saveBtn3" onclick="$('#spinner3').show(); addComment($('#jsonCode3').val(), $('#bookId3').val())">Save</a> </div>
-  </div>
-  
 
   <div  style="text-align:center">
-  	<span class="label">Displaying ${books.size()} results</span>
+  	<span class="label">Displaying ${comments.size()} results</span>
 	</div>
 	
 
@@ -243,7 +200,6 @@ body {
 	var g_refreshPage = false;
 	$('#spinner').hide();
 	$('#spinner2').hide();
-	$('#spinner3').hide();
 	
 	$('#myModal').on('hidden', function () {
 	  if(g_refreshPage) {
@@ -253,13 +209,6 @@ body {
 	})
 	
 	$('#myModal2').on('hidden', function () {
-	  if(g_refreshPage) {
-	  	
-	  	document.location.reload();
-	  }
-	})
-	
-	$('#myModal3').on('hidden', function () {
 	  if(g_refreshPage) {
 	  	
 	  	document.location.reload();
@@ -364,54 +313,16 @@ body {
 			$('#main-alert2 span').html(msg);
 			$('#main-alert2').removeClass('alert-success').addClass('alert-error');
 		}).always(function() {
-			$('#spinner2').hide();
+			$('#spinner').hide();
 			$('#main-alert2').show().delay(3000).fadeOut('slow');
 		});
     }	
-    
-    function addComment(json, bookId) {
-		var url = "/Bookbook/api/book/" + bookId + "/opinion";
-    	$.ajax({
-    			url: url,
-    			type: "POST",
-    			statusCode: {
-					500: function() {
-  						var msg = "BookUp is having problems... see the application log for more details.";
-  						$('#main-alert3 span').html(msg);
-   						$('#main-alert3').removeClass('alert-success').addClass('alert-error');
-   						$('#spinner3').hide();
-						$('#main-alert3').show().delay(3000).fadeOut('slow');
-					}
-				},
-    			data: {jsondata : json }
-    	}).done(function(msg) { 
-    		$('#main-alert3 span').html('Comment add successful!');
-   			$('#main-alert3').removeClass('alert-error').addClass('alert-success');
-   			g_refreshPage = true;
-   			$('#myModal3').modal('hide'); // hide the window after a delete 
-   		}).fail(function(jqXHR, textStatus) {
-		 	var msg = "BookUp is having problems... see the application log for more details.";
-			$('#main-alert3 span').html(msg);
-			$('#main-alert3').removeClass('alert-success').addClass('alert-error');
-		}).always(function() {
-			$('#spinner3').hide();
-			$('#main-alert3').show().delay(3000).fadeOut('slow');
-		});
-    }	
 		
-	function launchAddBookModal() {
+	function launchAddCommentModal() {
 		$('#myModal2').modal('show');
-		$('#popupTitle2').text('Add a book');
-		var json = '({"author":"","description":"","isbn10":"","pubType":"","smallThumbnailUrl":"","source":"","thumbnailUrl":"","title":"","creatorUserId":""})';
+		$('#popupTitle2').text('Add a comment');
+		var json = '({"text":"","bookId":"","userId":""})';
 		$('#jsonCode2').val(JSON.stringify(eval(json), undefined, 2));
-	}	
-	
-	function launchAddCommentModal(bookInfo) {
-		$('#myModal3').modal('show');
-		$('#popupTitle3').text('Add a comment');
-		var json = '({"text":"","bookId":bookInfo,"userId":""})';
-		$('#jsonCode3').val(JSON.stringify(eval(json), undefined, 2));
-		$('#bookId3').val(bookInfo);
 	}	
 	
 	function addGoogleBook(addBtn) {

@@ -67,7 +67,7 @@ class UserController {
 		log.debug "validation checked out ok!"
 		def addedUser = userService.addUser(jsonUser)
 		if(addedUser) {
-			updatePhoto(addedUser.userId, b)
+			updatePhotoFunction(addedUser.userId, b)
 			render addedUser as JSON
 		}			
 	}
@@ -100,7 +100,7 @@ class UserController {
 		
 		if(user) {
 			log.info "Login successful for user ${user.userName}:${user.userId}"
-			updatePhoto(user.userId, b)
+			updatePhotoFunction(user.userId, b)
 			render user as JSON
 		} else {
 			log.info "Login failed - sending 403 Forbidden"
@@ -142,7 +142,7 @@ class UserController {
 		
 		if(jsonUser.picture) {
 			byte[] b = jsonUser.picture.decodeBase64()
-			jsonUser.photoUrl = updatePhoto(jsonUser.userId, b)
+			jsonUser.photoUrl = updatePhotoFunction(jsonUser.userId, b)
 		}
 		
 		log.debug "userId to update - ${params.userId}"
@@ -249,7 +249,7 @@ class UserController {
 		return true;
 	}
 	
-	def updatePhoto(userId, b) { 
+	def updatePhotoFunction(userId, b) { 
 		// Write to a file
 		def filename = userId + ".profilephoto.${new Date().getTime()}.png";
 		def fos= new FileOutputStream(basePhotoPath + filename)
@@ -259,6 +259,7 @@ class UserController {
 		// TODO: move this into the signInFacebook() method
 		// Update user photoUrl
 		def url = basePhotoUrl + filename
+		log.debug "Saving file to ${basePhotoPath}"
 		userService.updateUserPhotoUrl(userId, url)
 		return url
 	}

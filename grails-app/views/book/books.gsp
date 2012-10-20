@@ -61,6 +61,8 @@ body {
       <li><a href="/Bookbook/index/dashboard">Dashboard</a></li>
       <li class="active"><a href="/Bookbook/book/books">Books</a></li>
       <li><a href="/Bookbook/book/comments">Comments</a></li>
+      <li><a href="/Bookbook/book/activity">Book Activity</a></li>
+      <li><a href="/Bookbook/user/activity">Friend Activity</a></li>
 <!--      <li><a href="#">Book Lists</a></li>
       <li><a href="#">Users</a></li>
       <li><a href="#">Check-Ins</a></li>
@@ -88,8 +90,8 @@ body {
       <g:form action="books" controller="book" method="get" style="clear:none;margin:0;padding:0;">
       <div class="pull-right" style="margin-right:10px"> 
       	<span class="input-append">
-        	<input class="span2" name="title" id="appendedInputButton" size="16" type="text" style="width:200px" value="${queryReturn}"><button class="btn" type="submit"><i class="icon-search"></i> Search</button><button class="btn" type="button" onclick="window.location='/Bookbook/book/books'">Reset</button>
-        </span> 
+        	<input class="span2" name="title" id="appendedInputButton" placeholder="Enter a Book Title" size="16" type="text" style="width:200px" value="${queryReturn}"><button class="btn" type="submit"><i class="icon-search"></i> Search</button><button class="btn" type="button" onclick="window.location='/Bookbook/book/books'">Reset</button>
+        </span>  
       </div>
       </g:form>
       
@@ -140,13 +142,13 @@ body {
               		${fieldValue(bean: bookInstance, field: "createDate")}
               	</g:else>
               </td>    
-              <td width="120">
+              <td width="125">
               	<g:if test="${bookInstance.bookId == null}">
-              		<a id="jamil" class="btn btn-success" style="width:78px" href="#" onclick="addGoogleBook(this)">Add Book</a>
+              		<a id="jamil" class="btn btn-success" style="width:60px" href="#" onclick="addGoogleBook(this)">Add Book</a>
               		<span class="jsonForAdd" style="display:none">${jsonBookArray[i]}</span>
               	</g:if>
               	<g:else>
-              		<a id="jamil" class="btn btn-info" href="#" onclick="showEditWindow($('#book-${bookInstance.bookId}'));">Update</a>
+              		<a id="jamil" class="btn btn-info" style="width:60px" href="#" onclick="showEditWindow($('#book-${bookInstance.bookId}'));">Update</a>
               	</g:else>
               	<a id="" class="btn btn-warning" href="#" onclick="launchAddCommentModal($('#bookIdNumber-${bookInstance.bookId}').text());"><i class="icon-comment icon-white"></i></a>
               </td>

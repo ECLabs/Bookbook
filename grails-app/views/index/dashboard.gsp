@@ -61,6 +61,8 @@ body {
       <li class="active"><a href="/Bookbook/index/dashboard">Dashboard</a></li>
       <li><a href="/Bookbook/book/books">Books</a></li>
       <li><a href="/Bookbook/book/comments">Comments</a></li>
+      <li><a href="/Bookbook/book/activity">Book Activity</a></li>
+      <li><a href="/Bookbook/user/activity">Friend Activity</a></li>
 <!--       <li><a href="#">Book Lists</a></li>
       <li><a href="#">Users</a></li>
       <li><a href="#">Check-Ins</a></li>

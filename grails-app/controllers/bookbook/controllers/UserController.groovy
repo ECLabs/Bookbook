@@ -1,6 +1,7 @@
 package bookbook.controllers
 
 import bookbook.domain.User
+import bookbook.utils.ActivityStreamIterator
 import grails.converters.JSON
 
 import org.neo4j.graphdb.Direction
@@ -15,9 +16,11 @@ class UserController {
 
 	def userService
 	def bookService
+	def opinionService
 	def checkinService
 	def basePhotoPath = '/usr/bin/tomcat7/webapps/BookUpImages/'
 	def basePhotoUrl = 'http://labs.evanschambers.com:8080/BookUpImages/'
+	def queryReturn
 	
 	def enum RelTypes implements RelationshipType
 	{
@@ -26,6 +29,23 @@ class UserController {
 		BOOKS_REFERENCE,
 		BOOK,
 		FOLLOW
+	}
+	
+	
+	def activity = {
+		log.info "in activity(). Parameters are ${params.toString()}"
+		queryReturn = params.userId
+		if(params.userId) {
+			activity = getActivityStreamData(params.userId)
+		}
+		else {
+			activity = []
+		}
+	}
+	
+	def getActivityStream = {
+		log.info "about to load activity stream"
+		render getActivityStreamData(params.id) as JSON
 	}
 	
 	def add = { 		
@@ -158,12 +178,12 @@ class UserController {
 	
 	def findFollowers = { 
 		log.info "In findFollowers(). Parameters are ${params.toString()}"
-		render userService.findFollowList(params.userName, Direction.INCOMING) as JSON
+		render userService.findFollowList(params.userId, Direction.INCOMING) as JSON
 	}
 	
 	def findFollowing = { 
 		log.info "In findFollowing(). Parameters are ${params.toString()}"
-		render userService.findFollowList(params.userName, Direction.OUTGOING) as JSON
+		render userService.findFollowList(params.userIf, Direction.OUTGOING) as JSON
 	}
 	
 	/**
@@ -242,5 +262,21 @@ class UserController {
 		userService.updateUserPhotoUrl(userId, url)
 		return url
 	}
+	
+	def getActivityStreamData(String userId)  {
+		User user = userService.findUsersByProperty("id", Long.valueOf(userId))
+		if(user) {
+			ActivityStreamIterator activities = new ActivityStreamIterator(user, userService, opinionService, checkinService)
+			def returnActivities = []
+			while(activities.hasNext()) {
+				returnActivities.add(activities.next())		
+			}
+			return returnActivities
+		}
+		else {
+			return []
+		}
+	}
+	
 
 }

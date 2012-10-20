@@ -27,6 +27,9 @@ class UrlMappings {
 		"/api/book/update/$id"(controller:"book"){
 			action = [POST:"update"]
 		}
+		"/api/book/$id/activity-stream"(controller:"book") {
+			action = [GET:"getActivityStream"]
+		}
 		
 		/**
 		 * USERS MANAGEMENT
@@ -56,11 +59,11 @@ class UrlMappings {
 			action = [POST:"updatePhoto"]
 		}
 		
-		"/api/user/$userName/followers"(controller:"user"){
+		"/api/user/$userId/followers"(controller:"user"){
 			action = [GET:"findFollowers"]
 		}
 		
-		"/api/user/$userName/following"(controller:"user"){
+		"/api/user/$userId/following"(controller:"user"){
 			action = [GET:"findFollowing"]
 		}
 		
@@ -74,7 +77,13 @@ class UrlMappings {
 		"/api/user/update/userId-$userId"(controller:"user") {
 			action = [POST:"update"]
 		}
+		"/api/user/userId-$userId/activity-stream"(controller:"user") {
+			action = [GET:"getActivityStream"]
+		}
 		
+		"/api/user/$id/activity-stream"(controller:"user") {
+			action = [GET:"getActivityStream"]
+		}
 		
 		/**
 		 * CHECK INS
@@ -137,7 +146,16 @@ class UrlMappings {
 		}
 		*/
 		
+		/**
+		 * OPINIONS
+		 */
 		
+		"/api/opinion/$id"(controller:"book") {
+			action = [GET:"findOpinionById", DELETE:"deleteOpinion"]
+		}
+		"/api/opinion/$id/delete"(controller:"book") {
+			action = [GET:"deleteOpinion"]
+		}
 		
 		"/$controller/$action?/$id?"{
 			constraints {

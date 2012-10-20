@@ -8,7 +8,9 @@ import org.neo4j.graphdb.Node
 import org.neo4j.graphdb.Path
 import org.neo4j.graphdb.Relationship
 import org.neo4j.graphdb.RelationshipType
+import org.neo4j.graphdb.ReturnableEvaluator;
 import org.neo4j.graphdb.Transaction
+import org.neo4j.graphdb.TraversalPosition;
 import org.neo4j.graphdb.index.RelationshipIndex
 import org.neo4j.graphdb.traversal.TraversalDescription
 import org.neo4j.helpers.collection.IterableWrapper
@@ -16,6 +18,7 @@ import org.neo4j.kernel.Traversal
 
 import bookbook.domain.Book
 import bookbook.domain.CheckIn
+import bookbook.domain.Opinion;
 import bookbook.domain.User
 
 class CheckinService {
@@ -53,7 +56,6 @@ class CheckinService {
 		USER,
 		BOOKS_REFERENCE,
 		BOOK,
-		CHECK_IN, // remove this one once all are converted to the new linked list format
 		CHECK_INS,
 		NEXT_CHECKIN_FOR_BOOK,
 		NEXT_CHECKIN_FOR_USER,
@@ -94,31 +96,9 @@ class CheckinService {
 				return it
 			}
 			
-			// get the current associated root checkin
-			CheckIn originalCheckin = null;
-			def rels = b.underlyingNode.getRelationships(RelTypes.CHECK_INS, Direction.OUTGOING)
-			if(rels.hasNext()) {
-				
-				// there's an existing checkin, so we need to subordinate it to the new one
-				def existingCheckinRel = rels.next();
-				originalCheckin = new CheckIn(existingCheckinRel.getEndNode())
-				
-				// delete old relationship to the book
-				existingCheckinRel.delete()
-				
-				// create relationship from the new checkin to the orig one with reltype = NEXT_CHECKIN_FOR_BOOK
-				log.debug "about to create 1st relationship"
-				Relationship rel0 = newCheckin.underlyingNode.createRelationshipTo(originalCheckin.underlyingNode, RelTypes.NEXT_CHECKIN_FOR_BOOK)
-			}
-
-			// create relationship from book to new check node
-			log.debug "about to create 2nd relationship"
-			Relationship rel1 = b.underlyingNode.createRelationshipTo(newCheckin.underlyingNode, RelTypes.CHECK_INS)
+			def rel1 = addNodeToLinkedList(b.underlyingNode, newCheckin.underlyingNode, "CHECK_INS", "NEXT_CHECKIN_FOR_BOOK")
+			def rel2 = addNodeToLinkedList(u.underlyingNode, newCheckin.underlyingNode, "CHECK_INS", "NEXT_CHECKIN_FOR_USER")
 			
-			// create relationship from user to the new checkin
-			log.debug "about to create 3rd relationship"
-			Relationship rel2 = u.underlyingNode.createRelationshipTo(newCheckin.underlyingNode, RelTypes.CHECK_IN)
-			log.debug "after creating 3rd relationship"
 
 			checkInIndex.add(rel2, "userId", u.userId)
 			checkInIndex.add(rel1, "bookId", b.bookId)
@@ -139,6 +119,28 @@ class CheckinService {
 			tx.finish()
 		}
 		return newCheckin
+	}
+	
+	def addNodeToLinkedList(Node rootNode, Node newNode, String rootRelType, String nextRelType) {
+		
+		def rels = rootNode.getRelationships(RelTypes.valueOf(rootRelType), Direction.OUTGOING)
+		if(rels.hasNext()) {
+			
+			// there's an existing root node, so we need to subordinate it to the new one
+			def rootRel = rels.next();
+			def firstNode = rootRel.getEndNode()
+			
+			// delete old relationship to the book
+			rootRel.delete()
+			
+			// create relationship from the new node to the orig one with reltype = NEXT_OPINION_FOR_BOOK
+			log.debug "about to create 1st relationship"
+			newNode.createRelationshipTo(firstNode, RelTypes.valueOf(nextRelType))
+		}
+
+		// create relationship from book to new opinion node
+		log.debug "about to create relationship from book to new opinion node"
+		rootNode.createRelationshipTo(newNode, RelTypes.valueOf(rootRelType))
 	}
 	
 	def findCheckInsByBookId(bookId) {
@@ -207,6 +209,77 @@ class CheckinService {
 		*/
 		return allCheckIns
 	}
+	
+	def getUserCheckins(User user) {
+		Node startNode = null;
+		
+		def rels = user.underlyingNode.getRelationships(RelTypes.CHECK_INS, Direction.OUTGOING)
+		if(rels.hasNext()) {
+			def rel = rels.next()
+			startNode = rel.getEndNode()
+		}
+		else {
+			return null
+		}
+	
+		// create traverser and all all to the hashset
+		TraversalDescription traversal = Traversal.description().
+		depthFirst().
+		relationships( RelTypes.NEXT_CHECKIN_FOR_USER);
+		
+		Iterable<CheckIn> checkinIterator = new IterableWrapper<CheckIn, Path>(
+				traversal.traverse( startNode ) ) {
+				
+			@Override
+			protected CheckIn underlyingObjectToObject( Path path )
+			{
+				def rels2 = path.startNode().getRelationships(RelTypes.CHECK_INS, Direction.INCOMING)
+				if(rels2.hasNext()) {
+					return new CheckIn( path.endNode(),  new User(rels2.next().getStartNode()));
+				}
+				return new CheckIn( path.endNode() );
+			}
+		};
+	
+		return checkinIterator
+		
+	}
+	
+	def getBookCheckins(Book book) {
+		Node startNode = null;
+		
+		def rels = book.underlyingNode.getRelationships(RelTypes.CHECK_INS, Direction.OUTGOING)
+		if(rels.hasNext()) {
+			def rel = rels.next()
+			startNode = rel.getEndNode()
+		}
+		else {
+			return null
+		}
+	
+		// create traverser and all all to the hashset
+		TraversalDescription traversal = Traversal.description().
+		depthFirst().
+		relationships( RelTypes.NEXT_CHECKIN_FOR_BOOK);
+		
+		Iterable<CheckIn> checkinIterator = new IterableWrapper<CheckIn, Path>(
+				traversal.traverse( startNode ) ) {
+				
+			@Override
+			protected CheckIn underlyingObjectToObject( Path path )
+			{
+				def rels2 = path.startNode().getRelationships(RelTypes.CHECK_INS, Direction.INCOMING)
+				if(rels2.hasNext()) {
+					return new CheckIn( path.endNode(),  new Book(rels2.next().getStartNode()));
+				}
+				return new CheckIn( path.endNode() );
+			}
+		};
+	
+		return checkinIterator
+		
+	}
+	
 }
 
 class CheckinFactory {

@@ -420,10 +420,10 @@ class UserService {
 		addUser(userIn)
 	}
 	
-	def findFollowList(userName, direction) {
+	def findFollowList(userId, direction) {
 		// direction: Direction.OUTGOING, Direction.INCOMING
 		// friends are one way... more like followers
-		User u = findUsersByProperty("userName", userName)
+		User u = findUsersByProperty("id", userId)
 		
 		def trav = u.underlyingNode.traverse(Order.BREADTH_FIRST, StopEvaluator.DEPTH_ONE,
 			new ReturnableEvaluator()
@@ -469,7 +469,7 @@ class UserService {
 		Transaction tx = graphDb.beginTx()
 		
 		// make sure there isn't already a FOLLOW relationship
-		def following = findFollowList(userNameFollowing, Direction.OUTGOING) 
+		def following = findFollowList(u.userId, Direction.OUTGOING) 
 		for (User u3 in following) {
 			if(u3.userName.equals(userNameToFollow)) {
 				log.debug "this user already follows the target user."

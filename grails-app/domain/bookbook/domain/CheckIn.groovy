@@ -1,6 +1,7 @@
 package bookbook.domain
 
 import org.neo4j.graphdb.Direction
+import bookbook.utils.ActivityIF
 import org.neo4j.graphdb.Node
 import org.neo4j.graphdb.Path
 import org.neo4j.graphdb.RelationshipType
@@ -16,7 +17,7 @@ import org.neo4j.kernel.Traversal
  *
  */
 
-class CheckIn {
+class CheckIn extends ActivityIF {
 
 	Long checkInId
 	Long bookId
@@ -47,7 +48,8 @@ class CheckIn {
 		OPINION_BY,
 		CHECK_IN_OPINION,
 		OPINION_REFERENCE,
-		NEXT_CHECKIN_FOR_BOOK
+		NEXT_CHECKIN_FOR_BOOK,
+		NEXT_CHECKIN_FOR_USER
 	}
 	
     static constraints = { }
@@ -56,48 +58,9 @@ class CheckIn {
 	// Constructor
 	CheckIn(Node cNode) {
 		this.underlyingNode = cNode
-		
-		// get the related book
-		def bookRels = cNode.getRelationships(RelTypes.CHECK_IN, Direction.OUTGOING)
-		if(bookRels.hasNext()) {
-			//book = new Book(bookRels.next().getEndNode())
-		}
-		
-		// create traverser and all all to the hashset
-		TraversalDescription traversal = Traversal.description().
-		depthFirst().
-		relationships( RelTypes.NEXT_CHECKIN_FOR_BOOK, Direction.INCOMING );
-		
-		Iterable<CheckIn> checkinIterator = new IterableWrapper<CheckIn, Path>(
-				traversal.traverse( cNode ) ) {
-				
-			@Override
-			protected CheckIn underlyingObjectToObject( Path path )
-			{
-				def rels = path.startNode().getRelationships(RelTypes.CHECK_INS, Direction.INCOMING)
-				if(rels.hasNext()) {
-					this.book = new Book(rels.next().getStartNode())
-				}
-				return new CheckIn( path.endNode(), this.book );
-			}
-		};
-		
-		// get the related user
-		def userRels = cNode.getRelationships(RelTypes.CHECK_IN, Direction.INCOMING)
-		while(userRels.hasNext()) {
-			def r = userRels.next()
-			if(r.getStartNode().getProperty("id", null)) {
-				this.user = new User(r.getStartNode())
-				break
-			}
-			
-		}
-		
-		// get the related opinion
-		def oRels = cNode.getRelationships(RelTypes.CHECK_IN_OPINION, Direction.INCOMING)
-		if(oRels.hasNext()) {
-			opinion = new Opinion(oRels.next().getStartNode())
-		}
+		//this.book = getBookForCheckIn(cNode)
+		//this.user = getUserForCheckIn(cNode)
+		//this.opinion = getOpinionForCheckIn(cNode)
 		
 	}
 	
@@ -105,24 +68,16 @@ class CheckIn {
 	CheckIn(Node cNode, Book book) {
 		this.underlyingNode = cNode
 		this.book = book
-		
-		// get the related user
-		def userRels = cNode.getRelationships(RelTypes.CHECK_IN, Direction.INCOMING)
-		while(userRels.hasNext()) {
-			def r = userRels.next()
-			if(r.getStartNode().getProperty("id", null)) {
-				this.user = new User(r.getStartNode())
-				break
-			}			
-		}
-		
-		
-		// get the related opinion
-		def oRels = cNode.getRelationships(RelTypes.CHECK_IN_OPINION, Direction.INCOMING)
-		if(oRels.hasNext()) {
-			opinion = new Opinion(oRels.next().getStartNode())
-		}
-		
+		this.user = getUserForCheckIn(cNode)
+		this.opinion = getOpinionForCheckIn(cNode)
+	}
+	
+	// Constructor
+	CheckIn(Node cNode, User user) {
+		this.underlyingNode = cNode
+		this.user = user
+		this.book = getBookForCheckIn(cNode)
+		this.opinion = getOpinionForCheckIn(cNode)
 	}
 	
 	
@@ -148,7 +103,7 @@ class CheckIn {
 	public String getLatitude() { return underlyingNode.getProperty("latitude", null) }
 	public String getLongitude() { return underlyingNode.getProperty("longitude", null) }
 	public Node getUnderlyingNode() { return underlyingNode }
-	public Book getBook() { return book }
+	public Book getBook() { return getBookForCheckIn(underlyingNode) }
 	public User getUser() { return user }
 	public Opinion getOpinion() { return opinion }
 	
@@ -174,7 +129,80 @@ class CheckIn {
 		}
 	}
 	public void setOpinion(Opinion opinion) { this.opinion = opinion }
-
+	
+	private Opinion getOpinionForCheckIn(cNode) {
+		// get the related opinion
+		def oRels = cNode.getRelationships(RelTypes.CHECK_IN_OPINION, Direction.INCOMING)
+		if(oRels.hasNext()) {
+			return new Opinion(oRels.next().getStartNode())
+		}
+		return null
+	}
+	
+	private User getUserForCheckIn(Node cNode) {
+		// create traverser and all all to the hashset
+		TraversalDescription traversal = Traversal.description().
+		depthFirst().
+		relationships( RelTypes.NEXT_CHECKIN_FOR_USER, Direction.INCOMING );
+		
+		Iterable<CheckIn> checkInIterator = new IterableWrapper<CheckIn, Path>(
+				traversal.traverse( cNode ) ) {
+				
+			@Override
+			protected CheckIn underlyingObjectToObject( Path path )
+			{
+				return new CheckIn( path.endNode());
+			}
+		};
+	
+		Iterator itr = checkInIterator.iterator()
+		while(itr.hasNext()) {
+			CheckIn last = itr.next()
+			if(!itr.hasNext()) {
+				def rel = last.underlyingNode.getRelationships(RelTypes.CHECK_INS, Direction.INCOMING)
+				while(rel.hasNext()) {
+					def r = rel.next()
+					if(r.getStartNode().getProperty("userName", null)) {
+						return new User(r.getStartNode())
+					}
+				}
+			}
+		}
+		return null
+	}
+	
+	private Book getBookForCheckIn(Node cNode) {
+		// create traverser and all all to the hashset
+		TraversalDescription traversal = Traversal.description().
+		depthFirst().
+		relationships( RelTypes.NEXT_CHECKIN_FOR_BOOK, Direction.INCOMING );
+		
+		Iterable<CheckIn> checkInIterator = new IterableWrapper<CheckIn, Path>(
+				traversal.traverse( cNode ) ) {
+				
+			@Override
+			protected CheckIn underlyingObjectToObject( Path path )
+			{
+				return new CheckIn( path.endNode());
+			}
+		};
+	
+		Iterator itr = checkInIterator.iterator()
+		while(itr.hasNext()) {
+			CheckIn last = itr.next()
+			if(!itr.hasNext()) {
+				def rel = last.underlyingNode.getRelationships(RelTypes.CHECK_INS, Direction.INCOMING)
+				while(rel.hasNext()) {
+					def r = rel.next()
+					if(r.getStartNode().getProperty("title", null)) {
+						return new Book(r.getStartNode())
+					}
+				}
+			}
+		}
+		return null
+	}
+	
 	@Override
 	public int hashCode() {
 		final int prime = 31;

@@ -6,6 +6,7 @@ import bookbook.domain.GoogleBook
 import bookbook.domain.Book
 import bookbook.domain.Opinion
 import bookbook.domain.User
+import bookbook.utils.ActivityStreamIterator
 import grails.converters.JSON
 import org.codehaus.groovy.grails.web.json.JSONObject
 import javax.servlet.http.HttpServletRequest
@@ -23,6 +24,9 @@ class BookController {
 	def jsonBookArray = []
 	def graphDb
 	
+	/**
+	 * For admin UI
+	 */
 	def books = {
 		log.info "in books(). Parameters are ${params.toString()}"
 		queryReturn = params.title
@@ -54,10 +58,25 @@ class BookController {
 		
 	}
 	
+	def activity = {
+		log.info "in activity(). Parameters are ${params.toString()}"
+		queryReturn = params.bookId
+		if(params.bookId) {
+			activity = getActivityStreamData(params.bookId)
+		}
+		else {
+			activity = []
+		}		
+	}
+
 	def shutdown = {
 		log.info "Shutting down graph DB"
 		graphDb.shutdown()
 	}
+
+	/**
+	 * For API	
+	 */
 	
     def index = { 
 		render "I'm alive!  The current time is " + new Date()
@@ -226,8 +245,39 @@ class BookController {
 		}
 	}
 	
+	def deleteOpinion = {
+		opinionService.deleteOpinion(params.id)
+		render "deleted"
+		
+		
+	}
+	
+	def findOpinionById = {
+		render opinionService.findById(params.id) as JSON
+	}
 	def findOpinions = {
 		render opinionService.findByBookId(params.id) as JSON
+	}
+	
+	def getActivityStream = {
+		render getActivityStreamData(params.id) as JSON
+	}
+	
+	def getActivityStreamData(bookId) {
+		Book book = bookService.findBook(bookId)
+		if(book) { 
+			ActivityStreamIterator activities = new ActivityStreamIterator(book, bookService, opinionService, checkinService)
+			def returnActivities = []
+			while(activities.hasNext()) {
+				def a = activities.next()
+				returnActivities.add(a)
+				log.debug(a.createDate)
+			}
+			return returnActivities
+		}
+		else {
+			return []
+		}
 	}
 	
 	def copyProperties(def source, def target){
@@ -240,7 +290,6 @@ class BookController {
 	         it.setProperty(target, source.metaClass.getProperty(source, it.name))
 	   }
 	}
-
 	
 }
 

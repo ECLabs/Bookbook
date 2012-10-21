@@ -8,6 +8,7 @@
 <meta name="author" content="">
 <!-- Le styles -->
 <link rel="stylesheet" href="${resource(dir:'css',file:'bootstrap.css')}" />
+<link rel="shortcut icon" href="${resource(dir:'images',file:'favicon.ico')}" type="image/x-icon" />
 
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.2/jquery.min.js"></script>
 <style type="text/css">

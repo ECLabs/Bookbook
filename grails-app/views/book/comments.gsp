@@ -109,7 +109,7 @@ body {
         <th>Book</th>
         <th>Text</th>
         <th>Created</th>
-        <th>Actions</th>
+        <!-- <th>Actions</th> -->
       </tr>
       <g:each in="${comments}" status="i" var="commentInstance">
           <tr>  
@@ -128,11 +128,13 @@ body {
                       		${fieldValue(bean: commentInstance, field: "book.title")} (${commentInstance.book.bookId})
                     </td>
               		</a>
-              <td width="500"><g:truncate maxlength="200">${fieldValue(bean: commentInstance, field: "text")}</g:truncate></td>
-              <td width="120">${commentInstance.createDate}</td>
+              <td><g:truncate maxlength="200">${fieldValue(bean: commentInstance, field: "text")}</g:truncate></td>
+              <td>${commentInstance.createDate}</td>
+              <!--
               <td width="100">
               		<a id="jamil" class="btn btn-info" style="width:78px" href="#" onclick="return false; showEditWindow($('#comment-${commentInstance.opinionId}'));">Update</a>
               </td>
+              -->
           </tr>
       </g:each>
     </table>

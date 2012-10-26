@@ -41,8 +41,8 @@ body {
       </div>
       <div class="nav-collapse">
         <ul class="nav">
-          <li class="active"><a href="dashboard.html">Console</a></li>
-          <li><a href="#">API Documentation</a></li>
+          <li class="active"><g:link action="dashboard">Console</g:link></li>
+          <li><g:link action="apidocs">API Docs</g:link></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
@@ -98,15 +98,25 @@ body {
       
        <!-- <span class="label pull-left" style="margin-top:14px;margin-left:15px;">Showing all ### books</span> -->
     <div class="hero-unit">
-	  <h1>BookUP API Console v2.0</h1>
-	  <p>The BookUP API console is used by privileged administrators to manage books, users, search indexes, and other BookUP entities.  It can also be used as a test harness.</p>
+	  <h1>BookUP API Console</h1>
+	  <br/>
+	  <p>The BookUP API console is for privileged users to manage BookUP entities and test functionality.</p>
+	  <p>Access the API at <a href="http://labs.evanschambers.com:8080/Bookbook/api/">http://labs.evanschambers.com:8080/Bookbook/api/</a></p>
+	  <br/>
 	  <p>
-	    <a class="btn btn-primary btn-large" href="/Bookbook/index">
-	      Go to Older Version of the Console
-	    </a>
-	    <a class="btn btn-success btn-primary btn-large" href="/Bookbook/book/books">
-	      Jump to Books
-	    </a>
+	    <g:link action="index" class="btn btn-primary btn-large">
+	       <i class="icon-chevron-left icon-white"></i> Jump to Legacy Console
+	    </g:link>
+	    <g:link action="books" class="btn btn-success btn-primary btn-large" controller="book">
+	      <i class="icon-book icon-white"></i> Jump to Books
+	    </g:link>
+	    
+	    <g:link action="apidocs" class="btn btn-warning btn-primary btn-large">
+	    	<i class="icon-th-list icon-white"></i> Jump to API Docs
+	    </g:link>
+
+	    
+	    
 	  </p>
 	</div>
     

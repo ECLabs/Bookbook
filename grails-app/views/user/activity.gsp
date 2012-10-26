@@ -41,8 +41,8 @@ body {
       </div>
       <div class="nav-collapse">
         <ul class="nav">
-          <li class="active"><a href="/Bookbook/index/dashboard">Console</a></li>
-          <li><a href="#">API Documentation</a></li>
+          <li class="active"><g:link action="dashboard">Console</g:link></li>
+          <li><g:link action="apidocs">API Docs</g:link></li>
         </ul>
       </div>
       <!--/.nav-collapse -->

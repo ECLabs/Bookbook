@@ -47,6 +47,10 @@ class IndexController {
 
 	}
 	
+	def apidocs = {
+		
+	}
+	
 	def showuser = {
 		redirect(controller:"user", action: "findByUserId", params: [userId: params.id])
 	}

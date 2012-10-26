@@ -41,8 +41,8 @@ body {
       </div>
       <div class="nav-collapse">
         <ul class="nav">
-          <li class="active"><a href="/Bookbook/index/dashboard">Console</a></li>
-          <li><a href="#">API Documentation</a></li>
+          <li class="active"><g:link action="dashboard">Console</g:link></li>
+          <li><g:link action="apidocs">API Docs</g:link></li>
         </ul>
       </div>
       <!--/.nav-collapse -->
@@ -67,10 +67,13 @@ body {
 <!--      <li><a href="#">Book Lists</a></li>
       <li><a href="#">Users</a></li>
       <li><a href="#">Check-Ins</a></li>
-      <li><a href="#">Followers</a></li>
+      <li><a href="#">Followers</a></li> 
       <li class="dropdown"> <a class="dropdown-toggle" data-toggle="dropdown" href="#">Actions <b class="caret"></b> </a>
         <ul class="dropdown-menu">
-          
+          <li><a tabindex="-1" href="#">Shutdown Database</a></li>
+          <li><a tabindex="-1" href="#">Re-index Books</a></li>
+          <li><a tabindex="-1" href="#">Re-index Users</a></li>
+          <li><a tabindex="-1" href="#">Re-index Comments</a></li>
         </ul>
       </li> -->
     </ul>

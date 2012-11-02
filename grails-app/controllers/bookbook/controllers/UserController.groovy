@@ -18,7 +18,7 @@ class UserController {
 	def bookService
 	def opinionService
 	def checkinService
-	def basePhotoPath = '/usr/bin/tomcat7/webapps/BookUpImages/'
+	def basePhotoPath = '/products/tomcat/webapps/BookUpImages/'
 	def basePhotoUrl = 'http://labs.evanschambers.com:8080/BookUpImages/'
 	def queryReturn
 	

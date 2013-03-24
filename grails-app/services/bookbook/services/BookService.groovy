@@ -555,17 +555,12 @@ class BookService {
 	
 	def private findGoogleBooks(searchField, query, pageNumber, maxResults) {
 		def http2 = new HTTPBuilder(PROTECTED_RESOURCE_URL)
-		try {
-			http2.get(	path:'books/v1/volumes',
-						contentType:JSON,
-						query:[q:searchField+":"+query, key:API_KEY, startIndex:pageNumber, maxResults:maxResults])
-			{ resp2, bookData ->
-				log.debug("Data from google: ${bookData}")
-				return buildBooks(bookData);
-			}
-		}
-		catch(HttpResponseException e) {
-			log.error(e.message)
+		http2.get(	path:'books/v1/volumes',
+					contentType:JSON,
+					query:[q:searchField+":"+query, key:API_KEY, startIndex:pageNumber, maxResults:maxResults])
+		{ resp2, bookData ->
+			log.debug("Data from google: ${bookData}")
+			return buildBooks(bookData);
 		}
 	}
 	def private buildBooks(bookData) {

@@ -26,7 +26,11 @@
 		<link>
 			<name>.link_to_grails_plugins</name>
 			<type>2</type>
+<<<<<<< HEAD
 			<locationURI>GRAILS_ROOT/2.1.2/projects/Bookbook/plugins</locationURI>
+=======
+			<locationURI>GRAILS_ROOT/2.1.1/projects/Bookbook/plugins</locationURI>
+>>>>>>> 5aae55cbc2dbe03f2af0bfacf9eb43e82c2bf6a1
 		</link>
 	</linkedResources>
 </projectDescription>

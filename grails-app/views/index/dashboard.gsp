@@ -128,6 +128,7 @@ body {
 
   <hr>
   <footer>
+  	<hr/>
     <p>&copy; Evans & Chambers Technology, LLC 2012</p>
   </footer>
 </div>

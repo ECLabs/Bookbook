@@ -36,13 +36,6 @@ class BookService {
 
 	// Google Books API Oauth2
     static transactional = false
-	def NETWORK_NAME = "Google"
-	def CLIENT_ID = "690667165235.apps.googleusercontent.com"
-	def CLIENT_SECRET = "SnAOp_UYXQtrJECyYJJt8ET7"
-	def REDIRECT_URI = "http://localhost:8080/TimeWorks/googlebooks/getBooks"
-	def SCOPE = "https://www.googleapis.com/auth/books"
-	def RESPONSE_TYPE = "code"
-	def AUTHORIZE_URL = "https://accounts.google.com/o/oauth2/auth?client_id=${CLIENT_ID}&redirect_uri=${REDIRECT_URI}&scope=${SCOPE}&response_type=${RESPONSE_TYPE}";
 	def API_KEY = "AIzaSyDVA6hIs5OzCEkpXrcT5HDXz8YZYtiStj4" //"AIzaSyBPZDhWK99HC9v5DU9fqKj-POYldXcC7KU" //"AIzaSyCmCwkxWuUuSSOSneMPBA3vPF2UWNfwr_E"
 	def PROTECTED_RESOURCE_URL = "https://www.googleapis.com/";
 	
@@ -555,9 +548,10 @@ class BookService {
 	
 	def private findGoogleBooks(searchField, query, pageNumber, maxResults) {
 		def http2 = new HTTPBuilder(PROTECTED_RESOURCE_URL)
+		// the country code param is needed for runtime on EC2 server, where google can't determine geographic location of caller
 		http2.get(	path:'books/v1/volumes',
 					contentType:JSON,
-					query:[q:searchField+":"+query, key:API_KEY, startIndex:pageNumber, maxResults:maxResults])
+					query:[q:searchField+":"+query, key:API_KEY, startIndex:pageNumber, maxResults:maxResults, country:'US'])
 		{ resp2, bookData ->
 			log.debug("Data from google: ${bookData}")
 			return buildBooks(bookData);
